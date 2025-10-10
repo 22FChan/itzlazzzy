@@ -54,7 +54,7 @@ button:hover, .btn:hover {
 /* Lists */
 ul, ol {
     padding-left: 24px;
-}
+}   
 
 /* Responsive */
 @media (max-width: 600px) {
