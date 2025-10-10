@@ -28,6 +28,13 @@ h1, h2, h3 {
 /* Links */
 a {
     color: #2a7ae2;
+/* Mystical Woods Rough Script font */
+@font-face {
+     font-family: 'Mystical Woods Rough Script';
+     src: url('../fonts/MysticalWoodsRoughScript.ttf') format('truetype');
+     font-weight: normal;
+     font-style: normal;
+}
     text-decoration: none;
     transition: color 0.2s;
 }
@@ -52,6 +59,12 @@ button:hover, .btn:hover {
 }
 
 /* Lists */
+
+h1 {
+     font-family: 'Mystical Woods Rough Script', cursive, sans-serif;
+     font-size: 2.5rem;
+     letter-spacing: 1px;
+}
 ul, ol {
     padding-left: 24px;
 }   
