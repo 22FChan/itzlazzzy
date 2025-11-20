@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Warning Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            text-align: center;
+            background-color: #fff;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #ff0000;
+        }
+        .buttons {
+            margin-top: 20px;
+        }
+        .btn {
+            padding: 10px 20px;
+            margin: 0 10px;
+            font-size: 16px;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .btn-yes {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .btn-no {
+            background-color: #f44336;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Warning!</h1>
+        <p>Are you 18+?</p>
+        <p>Are you sure you want to proceed?</p>
+        <div class="buttons">
+            <button class="btn btn-yes" onclick="proceed()">Yes</button>
+            <button class="btn btn-no" onclick="stay()">No</button>
+        </div>
+    </div>
+
+    <script>
+        function proceed() {
+            window.location.href = "abc.html";
+        }
+
+        function stay() {
+            alert("Why did you click on this link bro?!!!?? Punishment is that this will redirect to phub in 5 seconds... HEHEHE"); // Show the alert
+            setTimeout(function() {
+                window.location.href = "https://pornhub.com"; // Redirect after 5 seconds
+            }, 5000); // 5000 milliseconds = 5 seconds
+        }
+    </script>
+</body>
+</html>

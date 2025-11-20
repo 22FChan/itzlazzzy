@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Boxes with Images, Text, and Buttons</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            padding: 20px;
+            margin: 0;
+        }
+        .box {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            width: 250px;
+            margin: 15px;
+            padding: 20px;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+        .box:hover {
+            transform: scale(1.05);
+        }
+        .box img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+        .box p {
+            font-size: 14px;
+            color: #333;
+            margin: 15px 0;
+        }
+        .btn {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+        .btn:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <img src="../images/p1.webp" alt="Image 1">
+        <p>Images (Realistic) </p>
+        <button class="btn" onclick="window.location.href='images.html'">Click here</button>
+    </div>
+
+    <div class="box">
+        <img src="../images/logo1.jpeg" alt="Image 2">
+        <p>Images (Art/Anime)</p>
+        <button class="btn" onclick="window.location.href='images2.html'">Click here</button>
+    </div>
+
+    <div class="box">
+        <img src="../images/p3.webp" alt="Image 3">
+        <p>Gifs</p>
+        <button class="btn" onclick="window.location.href='gifs.html'">Click here</button>
+    </div>
+
+    <div class="box">
+        <img src="../images/p4.webp" alt="Image 4">
+        <p>Videos (Realistic)</p>
+        <button class="btn" onclick="window.location.href='videos.html'">Click here</button>
+    </div>
+
+    <div class="box">
+        <img src="../images/p5.webp" alt="Image 5">
+        <p>Videos (Anime)</p>
+        <button class="btn" onclick="window.location.href='videos2.html'">Click here</button>
+    </div>
+</body>
+</html>
