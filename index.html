@@ -1,9 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Error</title>
-    <link rel="icon" href="/images/image1.png" type="image/png">
+    <title>Tempting Button</title>
+    <style>
+        /* General reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Background */
+        body {
+            height: 100vh;
+            background: #1b1b2f; /* Dark, cosmic background */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Arial', sans-serif;
+            overflow: hidden;
+            flex-direction: column; /* Stack text and button vertically */
+        }
+
+        /* Animated background effect */
+        .star-field {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: url('https://www.transparenttextures.com/patterns/black-linen.png'), radial-gradient(circle, #00b3ff, #2c3e50);
+            animation: starsMove 20s infinite linear;
+        }
+
+        /* Keyframes for the star field animation */
+        @keyframes starsMove {
+            0% {
+                background-position: 0 0;
+            }
+            100% {
+                background-position: 0 100%;
+            }
+        }
+
+        /* Text that sits behind the button */
+        .message {
+            position: relative;
+            color: #fff;
+            font-size: 50px;
+            font-weight: bold;
+            text-align: center;
+            text-transform: uppercase;
+            z-index: 1;
+            animation: fadeIn 3s ease-in-out infinite alternate;
+            margin-bottom: 30px; /* Space between text and button */
+        }
+
+        /* Animation for the message */
+        @keyframes fadeIn {
+            0% { opacity: 0; }
+            50% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
+        /* The button itself */
+        .tempting-btn {
+            background-color: #ff0000; /* Tomato red color */
+            color: #fff;
+            font-size: 24px;
+            font-weight: bold;
+            padding: 20px 50px;
+            border-radius: 50px;
+            border: none;
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Hover effect to make the button wiggle */
+        .tempting-btn:hover {
+            transform: scale(1) rotate(1deg);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .tempting-btn:active {
+            transform: scale(1.05);
+        }
+
+        /* Fancy animation when hovering */
+        .tempting-btn:before {
+            content: '🚀';
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            font-size: 30px;
+            transition: all 0.3s ease;
+        }
+
+        .tempting-btn:hover:before {
+            top: -20px;
+            left: -20px;
+        }
+
+        /* Fancy little space trails behind the button */
+        .tempting-btn:after {
+            content: '🌟';
+            position: absolute;
+            bottom: -20px;
+            right: -20px;
+            font-size: 30px;
+            transition: all 0.3s ease;
+        }
+
+        .tempting-btn:hover:after {
+            bottom: -30px;
+            right: -30px;
+        }
+
+    </style>
 </head>
 <body>
-    <h1>An Error Occurred</h1>
-    <p>Sorry, something went wrong while processing your request.</p>
+
+    <!-- Background with stars -->
+    <div class="star-field"></div>
+
+    <!-- Message -->
+    <div class="message">DO NOT PRESS THIS BUTTON</div>
+
+    <!-- The Button -->
+    <button class="tempting-btn" onclick="location.window.href='timeleft.html'">
+        Click Me!
+    </button>
+
+    <script>
+        function loop() {
+            setInterval(() => {
+                window.open('looping.html', '_blank')
+            }, 500); // 500 milliseconds = 0.5 seconds
+        }
+    </script>
+</body>
+</html>
