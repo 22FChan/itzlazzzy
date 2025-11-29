@@ -6,6 +6,15 @@
 
 html, body {
   min-height: 100%;
+  height: 100%;
+  overflow-y: scroll;      /* still scrollable */
+  scrollbar-width: none;   
+}
+
+body::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;
 }
 
 /* Background + base */
@@ -173,15 +182,16 @@ body::before {
 
 .quote-section {
   width: 100%;
-  min-height: 90vh; /* almost full screen under header */
+  min-height: 90vh;
   display: flex;
-  align-items: center;
+  align-items: flex-start;                     /* was: center */
   justify-content: center;
-  padding: 0 8vw;
+  padding: clamp(5rem, 18vh, 7rem) 8vw 0;     /* push content higher */
   text-align: center;
   position: relative;
   overflow: hidden;
 }
+
 
 .quote-section::before {
   content: "";
@@ -211,7 +221,10 @@ body::before {
   font-weight: 600;
   line-height: 1.25;
   color: #e6fffb;
+  display: inline-block;
+  min-height: 3.5em;   /* enough space for ~2 lines so the first line stays put */
 }
+
 
 .quote-text span.caret {
   display: inline-block;
