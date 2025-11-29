@@ -11,6 +11,18 @@ document.addEventListener("DOMContentLoaded", () => {
       .then(res => res.text())
       .then(html => {
         headerPlaceholder.innerHTML = html;
+
+        // Highlight active nav link based on current page
+        const path = window.location.pathname.split("/").pop() || "index.html";
+        const links = headerPlaceholder.querySelectorAll(".nav-link");
+        links.forEach(link => {
+          const href = link.getAttribute("href");
+          const isHome = (path === "" || path === "index.html") && href === "index.html";
+          const isJournal = (path === "journal.html") && href === "journal.html";
+          if (isHome || isJournal) {
+            link.classList.add("nav-link-active");
+          }
+        });
       })
       .catch(() => {
         headerPlaceholder.innerHTML = "";

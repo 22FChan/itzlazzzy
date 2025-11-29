@@ -6,6 +6,43 @@ let journalEntries = [];
 let currentEntryId = null;
 let autosaveTimeout = null;
 
+const JOURNAL_PROMPTS = [
+  "What did you do today that future you will be glad you did?",
+  "If today repeated 365 times, would you like where you end up? Why or why not?",
+  "What tiny decision today mattered more than it looked in the moment?",
+  "What drained your energy today? What gave you energy?",
+  "What are you avoiding that would take less than 10 minutes to start?",
+  "What would you tell yourself one year ago?",
+  "If today was a movie scene, what would the title of the scene be?",
+  "What is one thing you want to remember about today in 10 years?"
+];
+
+// Simple sound hooks. Place files like assets/sounds/save.mp3 etc.
+// If the files don't exist, the page will still work — sounds just won't play.
+let journalSoundsEnabled = true;
+const journalSounds = {};
+try {
+  journalSounds.save = new Audio("assets/sounds/save.mp3");
+  journalSounds.autosave = new Audio("assets/sounds/autosave.mp3");
+  journalSounds.newEntry = new Audio("assets/sounds/new-entry.mp3");
+  journalSounds.delete = new Audio("assets/sounds/delete.mp3");
+} catch (e) {
+  // Audio might not be supported; fail silently.
+}
+
+function playJournalSound(name) {
+  if (!journalSoundsEnabled) return;
+  const s = journalSounds[name];
+  if (!s) return;
+  try {
+    s.currentTime = 0;
+    s.play();
+  } catch (e) {
+    // Ignore autoplay / permission issues.
+  }
+}
+
+
 function loadJournalFromStorage() {
   try {
     const raw = localStorage.getItem(JOURNAL_STORAGE_KEY);
@@ -165,11 +202,26 @@ function renderEntries() {
   });
 }
 
-function setStatus(text, color) {
-  const statusEl = document.getElementById("journal-status");
-  if (!statusEl) return;
-  statusEl.textContent = text;
-  if (color) statusEl.style.color = color;
+function setStatus(text, color, state) {
+  const statusContainer = document.getElementById("journal-status");
+  const statusTextEl = document.getElementById("journal-status-text") || statusContainer;
+  const dot = document.getElementById("journal-status-dot");
+
+  if (!statusContainer) return;
+
+  statusTextEl.textContent = text;
+  if (color) statusTextEl.style.color = color;
+
+  if (dot) {
+    dot.classList.remove("journal-status-saving", "journal-status-error", "journal-status-saved");
+    if (state === "saving") {
+      dot.classList.add("journal-status-saving");
+    } else if (state === "error") {
+      dot.classList.add("journal-status-error");
+    } else {
+      dot.classList.add("journal-status-saved");
+    }
+  }
 }
 
 function clearEditor() {
@@ -184,7 +236,7 @@ function clearEditor() {
   if (dateDisplay) dateDisplay.textContent = "New entry (not yet saved)";
   tagInputs.forEach(cb => { cb.checked = false; });
 
-  setStatus("Ready for a new thought.", "#22c55e");
+  setStatus("Ready for a new thought.", "#22c55e", "saved");
   renderEntries();
 }
 
@@ -209,7 +261,7 @@ function openEntry(entryId) {
     cb.checked = tags.includes(cb.value);
   });
 
-  setStatus("Loaded entry.", "#22c55e");
+  setStatus("Loaded entry.", "#22c55e", "saved");
   renderEntries();
 }
 
@@ -231,7 +283,7 @@ function saveEntry(manual = false) {
   const { title, body, tags } = getEditorData();
   if (!title && !body) {
     if (manual) {
-      setStatus("Nothing to save yet.", "#f97373");
+      setStatus("Nothing to save yet.", "#f97373", "error");
     }
     return;
   }
@@ -273,15 +325,19 @@ function saveEntry(manual = false) {
   }
 
   if (manual) {
-    setStatus("Saved. Future you will remember this.", "#22c55e");
+    setStatus("Saved. Future you will remember this.", "#22c55e", "saved");
   } else {
-    setStatus("Autosaved.", "#22c55e");
+    setStatus("Autosaved.", "#22c55e", "saved");
   }
 }
 
 function scheduleAutosave() {
   clearTimeout(autosaveTimeout);
-  autosaveTimeout = setTimeout(() => saveEntry(false), 2000);
+  setStatus("Saving...", "#eab308", "saving");
+  autosaveTimeout = setTimeout(() => {
+    saveEntry(false);
+    playJournalSound("autosave");
+  }, 2000);
 }
 
 function deleteEntry() {
@@ -293,8 +349,9 @@ function deleteEntry() {
   if (idx === -1) return;
   journalEntries.splice(idx, 1);
   saveJournalToStorage();
+  playJournalSound('delete');
   clearEditor();
-  setStatus("Entry deleted.", "#f97373");
+  setStatus("Entry deleted.", "#f97373", "error");
 }
 
 function exportEntries() {
@@ -348,12 +405,48 @@ function initJournalPage() {
   const titleInput = document.getElementById("journal-title-input");
   const bodyInput = document.getElementById("journal-body-input");
   const tagInputs = document.querySelectorAll(".journal-tag-input");
+  const promptBtn = document.getElementById("journal-prompt-btn");
+  const todayBtn = document.getElementById("journal-today-btn");
+  const soundToggle = document.getElementById("journal-sound-toggle");
 
-  if (newBtn) newBtn.addEventListener("click", clearEditor);
-  if (saveBtn) saveBtn.addEventListener("click", () => saveEntry(true));
+  if (newBtn) newBtn.addEventListener("click", () => { clearEditor(); playJournalSound("newEntry"); });
+  if (saveBtn) saveBtn.addEventListener("click", () => { saveEntry(true); playJournalSound("save"); });
   if (deleteBtn) deleteBtn.addEventListener("click", deleteEntry);
   if (exportBtn) exportBtn.addEventListener("click", exportEntries);
   if (clearFiltersBtn) clearFiltersBtn.addEventListener("click", clearFilters);
+
+  if (promptBtn) {
+    promptBtn.addEventListener("click", () => {
+      const bodyInput = document.getElementById("journal-body-input");
+      if (!bodyInput) return;
+      const randomPrompt = JOURNAL_PROMPTS[Math.floor(Math.random() * JOURNAL_PROMPTS.length)];
+      if (!bodyInput.value.trim()) {
+        bodyInput.value = randomPrompt + "\n\n";
+      } else {
+        bodyInput.value += "\n\n" + randomPrompt + "\n";
+      }
+      bodyInput.focus();
+      scheduleAutosave();
+    });
+  }
+
+  if (todayBtn) {
+    todayBtn.addEventListener("click", () => {
+      const today = new Date().toISOString().split("T")[0];
+      const fromInput = document.getElementById("journal-from");
+      const toInput = document.getElementById("journal-to");
+      if (fromInput) fromInput.value = today;
+      if (toInput) toInput.value = today;
+      renderEntries();
+    });
+  }
+
+  if (soundToggle) {
+    soundToggle.addEventListener("click", () => {
+      journalSoundsEnabled = !journalSoundsEnabled;
+      soundToggle.textContent = journalSoundsEnabled ? "Sounds: On" : "Sounds: Off";
+    });
+  }
 
   if (searchInput) searchInput.addEventListener("input", renderEntries);
   if (fromInput) fromInput.addEventListener("change", renderEntries);

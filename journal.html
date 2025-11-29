@@ -25,6 +25,12 @@
           <button id="journal-new-btn" class="journal-btn primary" type="button">
             + New entry
           </button>
+          <button id="journal-prompt-btn" class="journal-btn subtle journal-btn-full" type="button">
+            Daily prompt
+          </button>
+          <button id="journal-sound-toggle" class="journal-btn subtle journal-btn-full" type="button">
+            Sounds: On
+          </button>
 
           <div class="journal-block">
             <label class="journal-label" for="journal-search">Search</label>
@@ -40,6 +46,7 @@
               <span class="journal-date-sep">–</span>
               <input id="journal-to" type="date" class="journal-input journal-input-date" />
             </div>
+            <button id="journal-today-btn" class="journal-link-btn journal-today-btn" type="button">Today</button>
           </div>
 
           <div class="journal-block">
@@ -74,7 +81,10 @@
               <div class="journal-editor-meta">
                 <div id="journal-date-display" class="journal-date-display">New entry (not yet saved)</div>
               </div>
-              <div class="journal-editor-status" id="journal-status">Autosave ready.</div>
+              <div class="journal-editor-status" id="journal-status">
+                <span id="journal-status-dot" class="journal-status-dot journal-status-saved"></span>
+                <span id="journal-status-text">Autosave ready.</span>
+              </div>
             </header>
 
             <div class="journal-editor-fields">
