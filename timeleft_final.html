@@ -1,0 +1,1275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Countdown to Your Chosen Date</title>
+<style>
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+
+    body {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        background:
+            radial-gradient(circle at top, #1f2933 0, #050607 55%, #000 100%);
+        color: #e6fffb;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+                     Roboto, sans-serif;
+        scroll-behavior: smooth;
+        position: relative;
+        overflow-x: hidden;
+    }
+
+    /* Ambient stars / glow */
+
+    body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        z-index: -1;
+        pointer-events: none;
+        background-image:
+            radial-gradient(1px 1px at 10% 20%, rgba(148, 163, 184, 0.5) 0, transparent 45%),
+            radial-gradient(1px 1px at 80% 30%, rgba(148, 163, 184, 0.4) 0, transparent 50%),
+            radial-gradient(2px 2px at 30% 80%, rgba(56, 189, 248, 0.45) 0, transparent 55%),
+            radial-gradient(1px 1px at 60% 60%, rgba(45, 212, 191, 0.5) 0, transparent 50%);
+        opacity: 0.25;
+        animation: star-drift 45s linear infinite alternate;
+    }
+
+    @keyframes star-drift {
+        from { transform: translate3d(0, 0, 0); }
+        to   { transform: translate3d(0, -40px, 0); }
+    }
+
+    .container {
+        width: min(900px, 100%);
+        padding: 3rem 2.5rem 2.75rem;
+        margin-top: 4vh;
+        margin-bottom: 6vh;
+        background: rgba(7, 12, 14, 0.96);
+        border-radius: 20px;
+        border: 1px solid rgba(0, 255, 204, 0.3);
+        box-shadow:
+            0 18px 45px rgba(0, 0, 0, 0.75),
+            0 0 40px rgba(0, 255, 204, 0.08);
+        text-align: center;
+        backdrop-filter: blur(10px);
+        animation: subtle-glow 14s ease-in-out infinite;
+    }
+
+    @keyframes subtle-glow {
+        0%, 100% {
+            box-shadow:
+                0 18px 45px rgba(0, 0, 0, 0.75),
+                0 0 28px rgba(0, 255, 204, 0.18);
+        }
+        50% {
+            box-shadow:
+                0 20px 55px rgba(0, 0, 0, 0.85),
+                0 0 40px rgba(34, 211, 238, 0.26);
+        }
+    }
+
+    .title-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        margin-bottom: 0.5rem;
+    }
+
+    h1 {
+        font-size: clamp(2.2rem, 3vw, 2.7rem);
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        color: #4efce4;
+        text-shadow: 0 0 14px rgba(0, 255, 204, 0.7);
+    }
+
+    .calendar-btn {
+        flex-shrink: 0;
+        border-radius: 999px;
+        border: 1px solid rgba(0, 255, 204, 0.6);
+        background: radial-gradient(circle at top left, rgba(34, 211, 238, 0.26), transparent 60%);
+        color: #e6fffb;
+        padding: 0.45rem 0.85rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        cursor: pointer;
+        font-size: 0.85rem;
+        font-weight: 600;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        backdrop-filter: blur(6px);
+        transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+    }
+
+    .calendar-btn span.icon {
+        font-size: 1.1rem;
+    }
+
+    .calendar-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.75),
+                    0 0 18px rgba(34, 211, 238, 0.55);
+        border-color: #22d3ee;
+    }
+
+    .subtitle {
+        color: #9fb3c8;
+        font-size: 0.95rem;
+        margin-bottom: 1.8rem;
+    }
+
+    #full-countdown {
+        font-size: 1.25rem;
+        line-height: 1.9;
+        margin-bottom: 1.6rem;
+    }
+
+    #full-countdown strong {
+        color: #00ffd0;
+        font-weight: 700;
+        font-size: 1.6rem;
+        text-shadow: 0 0 10px rgba(0, 255, 204, 0.6);
+    }
+
+    /* Progress bar */
+
+    #progress-wrapper {
+        margin-bottom: 2.2rem;
+        text-align: left;
+    }
+
+    .progress-label {
+        font-size: 0.9rem;
+        color: #9fb3c8;
+        margin-bottom: 0.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    #progress-percent {
+        font-weight: 600;
+        color: #00ffd0;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .progress-bar {
+        width: 100%;
+        height: 10px;
+        border-radius: 999px;
+        background: rgba(148, 163, 184, 0.18);
+        overflow: hidden;
+        position: relative;
+    }
+
+    #progress-fill {
+        height: 100%;
+        width: 0%;
+        border-radius: inherit;
+        background: linear-gradient(90deg, #00ffd0, #4efce4);
+        box-shadow: 0 0 20px rgba(0, 255, 204, 0.7);
+        transition: width 0.2s linear;
+    }
+
+    h2 {
+        font-size: 1.3rem;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        color: #c3f8ff;
+        margin-bottom: 1.4rem;
+    }
+
+    .units-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 1rem 1.25rem;
+    }
+
+    .unit-card {
+        padding: 0.8rem 1rem;
+        background: rgba(8, 20, 21, 0.95);
+        border-radius: 14px;
+        border: 1px solid rgba(0, 255, 204, 0.18);
+        box-shadow: 0 8px 18px rgba(0, 0, 0, 0.65);
+        backdrop-filter: blur(6px);
+    }
+
+    .unit-label {
+        display: block;
+        font-size: 0.9rem;
+        color: #9fb3c8;
+        margin-bottom: 0.25rem;
+    }
+
+    .unit-value {
+        font-size: 1.35rem;
+        font-weight: 600;
+        color: #00ffd0;
+        font-variant-numeric: tabular-nums;
+        word-break: break-all;
+    }
+
+    /* Custom countdown calendar panel */
+
+    .custom-panel {
+        margin-top: 1rem;
+        margin-bottom: 1.4rem;
+        padding: 0.9rem 1rem;
+        border-radius: 14px;
+        background: rgba(8, 25, 27, 0.97);
+        border: 1px solid rgba(34, 211, 238, 0.3);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.7);
+        text-align: left;
+    }
+
+    .custom-panel.hidden {
+        display: none;
+    }
+
+    .custom-panel-title {
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.14em;
+        color: #c3f8ff;
+        margin-bottom: 0.75rem;
+    }
+
+    .custom-panel-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1.6fr) minmax(0, 1.4fr) auto;
+        gap: 0.75rem;
+        align-items: center;
+    }
+
+    .custom-panel label {
+        font-size: 0.8rem;
+        color: #94a3b8;
+        margin-bottom: 0.25rem;
+        display: block;
+    }
+
+    .custom-panel input[type="date"],
+    .custom-panel input[type="text"] {
+        width: 100%;
+        padding: 0.45rem 0.6rem;
+        border-radius: 8px;
+        border: 1px solid rgba(148, 163, 184, 0.6);
+        background: rgba(15, 23, 42, 0.9);
+        color: #e5f9ff;
+        font-size: 0.85rem;
+        outline: none;
+        font-family: inherit;
+    }
+
+    .custom-panel input[type="date"]:focus,
+    .custom-panel input[type="text"]:focus {
+        border-color: #22d3ee;
+        box-shadow: 0 0 0 1px rgba(34, 211, 238, 0.4);
+    }
+
+    .custom-apply-btn {
+        margin-top: 1.1rem;
+        padding: 0.55rem 1rem;
+        border-radius: 999px;
+        border: 1px solid rgba(34, 211, 238, 0.8);
+        background: radial-gradient(circle at top left, rgba(34, 211, 238, 0.3), transparent 65%);
+        color: #e6fffb;
+        font-size: 0.8rem;
+        font-weight: 600;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        cursor: pointer;
+        white-space: nowrap;
+        transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+    }
+
+    .custom-apply-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.75),
+                    0 0 16px rgba(34, 211, 238, 0.6);
+        border-color: #00ffd0;
+    }
+
+    /* CTA button to scroll to quote */
+
+    .cta-btn {
+        margin-top: 2rem;
+        padding: 0.75rem 1.6rem;
+        border-radius: 999px;
+        border: 1px solid rgba(0, 255, 204, 0.7);
+        background: radial-gradient(circle at top left, rgba(0, 255, 204, 0.2), transparent 55%);
+        color: #e6fffb;
+        font-size: 0.95rem;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        cursor: pointer;
+        backdrop-filter: blur(6px);
+        transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+    }
+
+    .cta-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.65),
+                    0 0 18px rgba(0, 255, 204, 0.5);
+        border-color: #00ffd0;
+    }
+
+    .cta-btn.small {
+        margin-top: 0.9rem;
+        padding: 0.55rem 1.2rem;
+        font-size: 0.8rem;
+    }
+
+    /* Quote section */
+
+    .quote-section {
+        height: 100vh;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0 8vw;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .quote-section::before {
+        content: "";
+        position: absolute;
+        inset: -20%;
+        background:
+            radial-gradient(circle at top, rgba(78, 252, 228, 0.12), transparent 55%),
+            radial-gradient(circle at bottom, rgba(15, 23, 42, 0.85), #000);
+        opacity: 0.9;
+        z-index: -1;
+    }
+
+    .quote-inner {
+        max-width: 1100px;
+    }
+
+    .quote-label {
+        letter-spacing: 0.25em;
+        text-transform: uppercase;
+        font-size: 0.8rem;
+        color: #9fb3c8;
+        margin-bottom: 1.5rem;
+    }
+
+    .quote-text {
+        font-size: clamp(2rem, 4vw, 3.5rem);
+        font-weight: 600;
+        line-height: 1.25;
+        color: #e6fffb;
+    }
+
+    .quote-text span.caret {
+        display: inline-block;
+        width: 0.06em;
+        height: 1em;
+        margin-left: 0.1em;
+        background: #00ffd0;
+        transform: translateY(0.1em);
+        animation: blink 0.9s steps(1, start) infinite;
+    }
+
+    @keyframes blink {
+        0%, 50% { opacity: 1; }
+        50.01%, 100% { opacity: 0; }
+    }
+
+    /* Stats section */
+
+    .stats-section {
+        width: min(900px, 100%);
+        margin-bottom: 4rem;
+        padding: 2.5rem 2.5rem 2.8rem;
+        border-radius: 20px;
+        background: rgba(7, 14, 18, 0.96);
+        border: 1px solid rgba(15, 23, 42, 0.85);
+        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.8);
+    }
+
+    .stats-section h2 {
+        text-align: left;
+        margin-bottom: 1.6rem;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 1.2rem;
+    }
+
+    .stat-list {
+        list-style: disc;
+        margin-left: 1.1rem;
+        margin-top: 0.4rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.35rem;
+    }
+
+    .stat-list li {
+        font-size: 0.86rem;
+        color: #cbd5f5;
+    }
+
+
+    .stat-card {
+        padding: 1rem 1.1rem;
+        border-radius: 14px;
+        border: 1px dashed rgba(148, 163, 184, 0.4);
+        background: radial-gradient(circle at top left, rgba(15, 23, 42, 0.92), rgba(3, 7, 18, 0.96));
+        color: #cbd5f5;
+        font-size: 0.9rem;
+        text-align: left;
+    }
+
+    .stat-card-title {
+        font-size: 0.85rem;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: #a5f3fc;
+        margin-bottom: 0.55rem;
+    }
+
+    /* Reflection section */
+
+    .reflection-section {
+        width: min(900px, 100%);
+        margin-bottom: 5rem;
+        padding: 2.6rem 2.5rem 3rem;
+        border-radius: 20px;
+        background: rgba(6, 12, 17, 0.96);
+        border: 1px solid rgba(15, 23, 42, 0.95);
+        box-shadow: 0 18px 45px rgba(0, 0, 0, 0.9);
+    }
+
+    .reflection-inner h2 {
+        text-align: left;
+        margin-bottom: 0.6rem;
+    }
+
+    .reflection-inner p {
+        font-size: 0.95rem;
+        color: #9fb3c8;
+        margin-bottom: 1rem;
+        text-align: left;
+    }
+
+    #reflection-input {
+        width: 100%;
+        min-height: 90px;
+        max-height: 200px;
+        padding: 0.75rem 0.9rem;
+        border-radius: 12px;
+        border: 1px solid rgba(148, 163, 184, 0.6);
+        background: rgba(15, 23, 42, 0.9);
+        color: #e5f9ff;
+        font-size: 0.9rem;
+        resize: vertical;
+        outline: none;
+        font-family: inherit;
+    }
+
+    #reflection-input:focus {
+        border-color: #22d3ee;
+        box-shadow: 0 0 0 1px rgba(34, 211, 238, 0.4);
+    }
+
+    .reflection-saved {
+        font-size: 0.8rem;
+        color: #6ee7b7;
+        margin-top: 0.6rem;
+        min-height: 1.1em;
+    }
+
+    .reflection-previous {
+        margin-top: 1.4rem;
+        padding-top: 0.9rem;
+        border-top: 1px solid rgba(15, 23, 42, 0.8);
+        font-size: 0.85rem;
+        color: #94a3b8;
+    }
+
+    .reflection-previous span.label {
+        text-transform: uppercase;
+        letter-spacing: 0.16em;
+        font-size: 0.72rem;
+        color: #a5f3fc;
+        display: block;
+        margin-bottom: 0.4rem;
+    }
+
+    .reflection-previous-content {
+        font-style: italic;
+        color: #e5f9ff;
+    }
+
+    .time-on-page {
+        font-size: 0.8rem;
+        color: #64748b;
+        margin-bottom: 0.9rem;
+    }
+
+    @media (max-width: 600px) {
+        .container {
+            padding: 2.4rem 1.5rem 2.1rem;
+        }
+        #full-countdown {
+            font-size: 1.1rem;
+        }
+        .quote-section {
+            padding: 0 6vw;
+        }
+        .custom-panel-grid {
+            grid-template-columns: minmax(0, 1fr);
+        }
+        .title-row {
+            align-items: flex-start;
+        }
+    }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <div class="title-row">
+        <h1>Countdown to 2 November 2070</h1>
+        <button id="calendar-toggle" class="calendar-btn" type="button">
+            <span class="icon">📅</span>
+            <span>Custom date</span>
+        </button>
+    </div>
+
+    <p class="subtitle">Time left until 2 November 2070 from this very moment.</p>
+
+    <div id="full-countdown"></div>
+
+    <!-- Progress towards target -->
+    <div id="progress-wrapper">
+        <div class="progress-label">
+            <span>Journey to your target date</span>
+            <span id="progress-percent"></span>
+        </div>
+        <div class="progress-bar">
+            <div id="progress-fill"></div>
+        </div>
+    </div>
+
+    <!-- Mini calendar / custom countdown panel -->
+    <div id="custom-panel" class="custom-panel hidden">
+        <div class="custom-panel-title">Create a personal countdown</div>
+        <div class="custom-panel-grid">
+            <div>
+                <label for="custom-date">Target date</label>
+                <input type="date" id="custom-date">
+            </div>
+            <div>
+                <label for="custom-label">What is this for? (optional)</label>
+                <input type="text" id="custom-label" placeholder="e.g. My big goal, graduation, trip...">
+            </div>
+            <div>
+                <button id="custom-apply" class="custom-apply-btn" type="button">
+                    Start countdown
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <h2>Individual Units</h2>
+    <div class="units-grid">
+        <div class="unit-card">
+            <span class="unit-label">Years left</span>
+            <span id="years" class="unit-value"></span>
+        </div>
+        <div class="unit-card">
+            <span class="unit-label">Months left</span>
+            <span id="months" class="unit-value"></span>
+        </div>
+        <div class="unit-card">
+            <span class="unit-label">Days left</span>
+            <span id="days" class="unit-value"></span>
+        </div>
+        <div class="unit-card">
+            <span class="unit-label">Hours left</span>
+            <span id="hours" class="unit-value"></span>
+        </div>
+        <div class="unit-card">
+            <span class="unit-label">Minutes left</span>
+            <span id="minutes" class="unit-value"></span>
+        </div>
+        <div class="unit-card">
+            <span class="unit-label">Seconds left</span>
+            <span id="seconds" class="unit-value"></span>
+        </div>
+        <div class="unit-card">
+            <span class="unit-label">Milliseconds left</span>
+            <span id="milliseconds" class="unit-value"></span>
+        </div>
+        <div class="unit-card">
+            <span class="unit-label">Microseconds left</span>
+            <span id="microseconds" class="unit-value"></span>
+        </div>
+    </div>
+
+    <button id="scroll-quote-btn" class="cta-btn" type="button">
+        Reflect on your time ↓
+    </button>
+</div>
+
+<section class="quote-section">
+    <div class="quote-inner">
+        <div class="quote-label">Scroll down, and remember</div>
+        <div class="quote-text" id="quote-text">
+            <span class="caret"></span>
+        </div>
+    </div>
+</section>
+
+<section class="stats-section">
+    <h2>What this time could contain</h2>
+    <div class="stats-grid">
+        <!-- 📚 Reading -->
+        <div class="stat-card">
+            <div class="stat-card-title">📚 Reading</div>
+            <ul class="stat-list">
+                <li>
+                    You could read about
+                    <strong id="stat-pages"></strong> pages before your target.
+                </li>
+                <li>
+                    That’s roughly
+                    <strong id="stat-books"></strong> books
+                    (if a book averages 250 pages).
+                </li>
+                <li>
+                    Equivalent to rereading a full PhD syllabus roughly
+                    <strong id="stat-phd-times"></strong> times.
+                </li>
+                <li>
+                    Enough to finish your entire “someday” list…
+                    and still have room for thousands more.
+                </li>
+            </ul>
+        </div>
+
+        <!-- 🧠 Learning & Skills -->
+        <div class="stat-card">
+            <div class="stat-card-title">🧠 Learning &amp; Skills</div>
+            <ul class="stat-list">
+                <li>
+                    You have about
+                    <strong id="stat-seconds"></strong> seconds of time left to learn things.
+                </li>
+                <li>
+                    At 10,000 hours per skill, that’s around
+                    <strong id="stat-skills"></strong> full mastery-level skills
+                    (if you went absolutely all in).
+                </li>
+                <li>
+                    You could watch roughly
+                    <strong id="stat-tutorials"></strong> tutorial videos
+                    and still have time left to practice.
+                </li>
+                <li>
+                    That’s like finishing
+                    <strong id="stat-courses"></strong> big online courses in a single lifetime.
+                </li>
+            </ul>
+        </div>
+
+        <!-- 🎵 Music -->
+        <div class="stat-card">
+            <div class="stat-card-title">🎵 Music</div>
+            <ul class="stat-list">
+                <li>
+                    You could listen to about
+                    <strong id="stat-songs"></strong> songs back-to-back.
+                </li>
+                <li>
+                    Or replay the same 3-minute song roughly
+                    <strong id="stat-song-repeats"></strong> times.
+                </li>
+                <li>
+                    Enough to hear entire genres rise, die, and come back ironically.
+                </li>
+            </ul>
+        </div>
+
+        <!-- ✍️ Writing -->
+        <div class="stat-card">
+            <div class="stat-card-title">✍️ Writing</div>
+            <ul class="stat-list">
+                <li>
+                    You could write around
+                    <strong id="stat-novels"></strong> full novels at a steady pace.
+                </li>
+                <li>
+                    Or log roughly
+                    <strong id="stat-journal-years"></strong> years of daily journaling
+                    (1 hour per day).
+                </li>
+                <li>
+                    Enough to document every version of yourself you ever become.
+                </li>
+            </ul>
+        </div>
+
+        <!-- 🎨 Art & Creation -->
+        <div class="stat-card">
+            <div class="stat-card-title">🎨 Art &amp; Creation</div>
+            <ul class="stat-list">
+                <li>
+                    You could sketch about
+                    <strong id="stat-sketches"></strong> times.
+                </li>
+                <li>
+                    And complete around
+                    <strong id="stat-paintings"></strong> full paintings
+                    (even at one every day or two).
+                </li>
+                <li>
+                    More than enough to become unreasonably good at anything creative.
+                </li>
+            </ul>
+        </div>
+
+        <!-- 💻 Programming & Building -->
+        <div class="stat-card">
+            <div class="stat-card-title">💻 Programming &amp; Building</div>
+            <ul class="stat-list">
+                <li>
+                    You could write roughly
+                    <strong id="stat-lines-code"></strong> lines of code.
+                </li>
+                <li>
+                    That’s enough for about
+                    <strong id="stat-projects"></strong> large projects
+                    (or absolutely too many side projects).
+                </li>
+                <li>
+                    Enough to build tools future-you would be shocked you made.
+                </li>
+            </ul>
+        </div>
+
+        <!-- 💪 Fitness -->
+        <div class="stat-card">
+            <div class="stat-card-title">💪 Fitness</div>
+            <ul class="stat-list">
+                <li>
+                    You could technically do around
+                    <strong id="stat-pushups"></strong> push-ups
+                    (one every 2 seconds, if you were wild).
+                </li>
+                <li>
+                    You could walk roughly
+                    <strong id="stat-walk-km"></strong> km —
+                    about
+                    <strong id="stat-earth-laps"></strong> laps around Earth.
+                </li>
+            </ul>
+        </div>
+
+        <!-- 🎬 Movies & Stories -->
+        <div class="stat-card">
+            <div class="stat-card-title">🎬 Movies &amp; Stories</div>
+            <ul class="stat-list">
+                <li>
+                    You could watch around
+                    <strong id="stat-movies"></strong> movies
+                    if you binged them back-to-back.
+                </li>
+                <li>
+                    Or rewatch your favourite trilogy roughly
+                    <strong id="stat-trilogies"></strong> times.
+                </li>
+            </ul>
+        </div>
+
+        <!-- 🧩 Deep Work -->
+        <div class="stat-card">
+            <div class="stat-card-title">🧩 Deep Work</div>
+            <ul class="stat-list">
+                <li>
+                    You could fit about
+                    <strong id="stat-deep-sessions"></strong> deep-focus sessions (25 minutes each).
+                </li>
+                <li>
+                    That’s the kind of output that quietly changes entire life trajectories.
+                </li>
+            </ul>
+        </div>
+    </div>
+
+</section>
+
+<section class="reflection-section">
+    <div class="reflection-inner">
+        <h2>What will you do with your next hour?</h2>
+        <p>Write one small, concrete thing you’ll do with your time. It doesn’t have to be huge — just real.</p>
+        <p id="time-on-page" class="time-on-page">You've already spent 0 seconds on this page.</p>
+        <textarea id="reflection-input" placeholder="I will spend the next hour doing..."></textarea>
+        <button id="save-reflection" class="cta-btn small" type="button">
+            Save this intention
+        </button>
+        <div id="reflection-saved" class="reflection-saved"></div>
+
+        <div id="reflection-previous" class="reflection-previous" style="display:none;">
+            <span class="label">Last intentions you wrote</span>
+            <div class="reflection-previous-content" id="reflection-previous-content"></div>
+        </div>
+    </div>
+</section>
+
+<script>
+/* ===== Global countdown config ===== */
+
+// Main target date (can be changed by user)
+var mainTarget = new Date("2070-11-02T00:00:00");
+
+// Start of the "journey" for the progress bar
+const journeyStart = new Date("2025-01-01T00:00:00");
+
+/* ===== Core countdown update ===== */
+
+function updateCountdown() {
+    const now = new Date();
+    let diff = mainTarget - now;
+
+    // Clamp at zero once we've passed the target
+    if (diff <= 0) diff = 0;
+
+    // --- Raw totals (from milliseconds up) ---
+    const totalMicroseconds = Math.floor(diff * 1000);
+    const totalMilliseconds = Math.floor(diff);
+    const totalSeconds      = Math.floor(diff / 1000);
+    const totalMinutes      = Math.floor(totalSeconds / 60);
+    const totalHours        = Math.floor(totalMinutes / 60);
+    const totalDays         = Math.floor(totalHours / 24);
+    const totalMonths       = Math.floor(totalDays / 30.4375);
+    const totalYears        = Math.floor(totalMonths / 12);
+
+    // --- Breakdown for the nice sentence ---
+    const years        = totalYears;
+    const months       = Math.floor(totalMonths % 12);
+    const days         = Math.floor(totalDays % 30.4375);
+    const hours        = totalHours % 24;
+    const minutes      = totalMinutes % 60;
+    const seconds      = totalSeconds % 60;
+    const milliseconds = diff % 1000;
+    const microseconds = totalMicroseconds % 1000;
+
+    // --- Main combined countdown text ---
+    const fullEl = document.getElementById("full-countdown");
+    if (fullEl) {
+        fullEl.innerHTML =
+            `<strong>${years}</strong> years&nbsp;` +
+            `<strong>${months}</strong> months&nbsp;` +
+            `<strong>${days}</strong> days&nbsp;` +
+            `<strong>${hours}</strong> hours&nbsp;` +
+            `<strong>${minutes}</strong> minutes&nbsp;` +
+            `<strong>${seconds}</strong> seconds&nbsp;` +
+            `<strong>${milliseconds}</strong> ms&nbsp;` +
+            `<strong>${microseconds}</strong> µs`;
+    }
+
+    // --- Individual unit cards (totals) ---
+    const setText = (id, value) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = value.toLocaleString();
+    };
+
+    setText("years",        totalYears);
+    setText("months",       totalMonths);
+    setText("days",         totalDays);
+    setText("hours",        totalHours);
+    setText("minutes",      totalMinutes);
+    setText("seconds",      totalSeconds);
+    setText("milliseconds", totalMilliseconds);
+    setText("microseconds", totalMicroseconds);
+
+    // --- Progress bar & stats ---
+    updateProgress(now);
+    updateStats(totalDays, totalHours, totalMinutes, totalMinutes);
+}
+
+/* ===== Progress bar ===== */
+
+function updateProgress(now) {
+    const totalSpan = mainTarget - journeyStart;
+    let elapsed = now - journeyStart;
+    if (elapsed < 0) elapsed = 0;
+
+    let progress = totalSpan > 0 ? (elapsed / totalSpan) * 100 : 100;
+    if (progress < 0) progress = 0;
+    if (progress > 100) progress = 100;
+
+    const progressFill = document.getElementById("progress-fill");
+    const progressPercent = document.getElementById("progress-percent");
+    if (progressFill && progressPercent) {
+        progressFill.style.width = progress.toFixed(4) + "%";
+        progressPercent.textContent = progress.toFixed(4) + "%";
+    }
+}
+
+/* ===== Stats: What this time could contain ===== */
+
+function updateStats(totalDays, totalHours, totalMinutes, totalSeconds) {
+    // Grab all elements once
+    const el = id => document.getElementById(id);
+
+    // ----- Reading -----
+    // Assume 1 page every 3 seconds if reading non-stop (comically optimistic).
+    const pages = Math.floor(totalSeconds / 3);
+    const books = Math.floor(pages / 250);
+    const phdSyllabusPages = 50000; // rough "big program" guess
+    const phdTimes = Math.max(1, Math.floor(pages / phdSyllabusPages));
+
+    if (el("stat-pages"))       el("stat-pages").textContent       = pages.toLocaleString();
+    if (el("stat-books"))       el("stat-books").textContent       = books.toLocaleString();
+    if (el("stat-phd-times"))   el("stat-phd-times").textContent   = phdTimes.toLocaleString();
+
+    // ----- Learning & Skills -----
+    const seconds = totalSeconds;
+    const skills = Math.max(1, Math.floor(totalHours / 10000));        // 10k hours/skill
+    const tutorials = Math.floor(totalMinutes / 10);                    // 10 min/tutorial
+    const courses = Math.floor(totalHours / 40);                        // 40 hr/course
+
+    if (el("stat-seconds"))     el("stat-seconds").textContent     = seconds.toLocaleString();
+    if (el("stat-skills"))      el("stat-skills").textContent      = skills.toLocaleString();
+    if (el("stat-tutorials"))   el("stat-tutorials").textContent   = tutorials.toLocaleString();
+    if (el("stat-courses"))     el("stat-courses").textContent     = courses.toLocaleString();
+
+    // ----- Music -----
+    const songs = Math.floor(totalMinutes / 3);                         // 3 min/song
+    const songRepeats = Math.floor(totalSeconds / 180);                 // 3 min/song in seconds
+
+    if (el("stat-songs"))           el("stat-songs").textContent           = songs.toLocaleString();
+    if (el("stat-song-repeats"))    el("stat-song-repeats").textContent    = songRepeats.toLocaleString();
+
+    // ----- Writing -----
+    const wordsPerMinute = 40;
+    const totalWords = totalMinutes * wordsPerMinute;
+    const novelWords = 80000;
+    const novels = Math.floor(totalWords / novelWords);
+    const journalHours = totalHours;
+    const journalYears = Math.floor(journalHours / (365 * 1));          // 1 hour per day ≈ 1 year of journaling
+
+    if (el("stat-novels"))        el("stat-novels").textContent        = novels.toLocaleString();
+    if (el("stat-journal-years")) el("stat-journal-years").textContent = journalYears.toLocaleString();
+
+    // ----- Art & Creation -----
+    const sketches = Math.floor(totalMinutes / 5);                      // 1 sketch / 5 min
+    const paintings = Math.floor(totalDays / 2);                        // 1 painting every 2 days
+
+    if (el("stat-sketches"))   el("stat-sketches").textContent   = sketches.toLocaleString();
+    if (el("stat-paintings"))  el("stat-paintings").textContent  = paintings.toLocaleString();
+
+    // ----- Programming & Building -----
+    const linesPerHour = 50;                                           // sustained, careful pace
+    const linesCode = totalHours * linesPerHour;
+    const hoursPerProject = 500;
+    const projects = Math.floor(totalHours / hoursPerProject);
+
+    if (el("stat-lines-code")) el("stat-lines-code").textContent = linesCode.toLocaleString();
+    if (el("stat-projects"))   el("stat-projects").textContent   = projects.toLocaleString();
+
+    // ----- Fitness -----
+    const pushups = Math.floor(totalSeconds / 2);                       // 1 push-up every 2s
+    const kmPerHour = 5;                                                // walking
+    const walkKm = Math.floor(totalHours * kmPerHour);
+    const earthCircumferenceKm = 40075;
+    const earthLaps = Math.floor(walkKm / earthCircumferenceKm);
+
+    if (el("stat-pushups"))    el("stat-pushups").textContent    = pushups.toLocaleString();
+    if (el("stat-walk-km"))    el("stat-walk-km").textContent    = walkKm.toLocaleString();
+    if (el("stat-earth-laps")) el("stat-earth-laps").textContent = earthLaps.toLocaleString();
+
+    // ----- Movies & Stories -----
+    const movies = Math.floor(totalHours / 2);                          // 2 hr per movie
+    const trilogies = Math.floor(totalHours / 6);                       // 3 movies * 2 hr
+
+    if (el("stat-movies"))     el("stat-movies").textContent     = movies.toLocaleString();
+    if (el("stat-trilogies"))  el("stat-trilogies").textContent  = trilogies.toLocaleString();
+
+    // ----- Deep Work -----
+    const deepSessions = Math.floor(totalMinutes / 25);                 // 25-min sessions
+
+    if (el("stat-deep-sessions")) el("stat-deep-sessions").textContent = deepSessions.toLocaleString();
+}
+
+
+/* ===== Typewriter quote logic ===== */
+
+const fullQuote =
+    "Your time is the one currency you can never earn back. Spend it on what truly matters.";
+
+let quoteIndex = 0;
+let typingIntervalId = null;
+
+function resetTypewriter() {
+    clearInterval(typingIntervalId);
+    typingIntervalId = null;
+    quoteIndex = 0;
+
+    const quoteEl = document.getElementById("quote-text");
+    if (quoteEl) {
+        quoteEl.innerHTML = '<span class="caret"></span>';
+    }
+}
+
+function startTypewriter() {
+    const quoteEl = document.getElementById("quote-text");
+    if (!quoteEl) return;
+
+    resetTypewriter();
+
+    typingIntervalId = setInterval(() => {
+        if (quoteIndex < fullQuote.length) {
+            const visibleText = fullQuote.slice(0, quoteIndex + 1);
+            quoteEl.innerHTML = visibleText + '<span class="caret"></span>';
+            quoteIndex++;
+        } else {
+            clearInterval(typingIntervalId);
+            typingIntervalId = null;
+        }
+    }, 55);
+}
+
+/* ===== Scroll to quote button ===== */
+
+document.getElementById("scroll-quote-btn")?.addEventListener("click", () => {
+    document.querySelector(".quote-section")?.scrollIntoView({ behavior: "smooth" });
+});
+
+/* ===== Custom countdown / calendar logic (changes main target) ===== */
+
+var STORED_TARGET_KEY = "main_target_iso";
+var STORED_TARGET_LABEL_KEY = "main_target_label";
+
+const calendarToggle   = document.getElementById("calendar-toggle");
+const customPanel      = document.getElementById("custom-panel");
+const customDateInput  = document.getElementById("custom-date");
+const customLabelInput = document.getElementById("custom-label");
+const customApplyBtn   = document.getElementById("custom-apply");
+
+// open/close panel
+if (calendarToggle && customPanel) {
+    calendarToggle.addEventListener("click", () => {
+        customPanel.classList.toggle("hidden");
+    });
+}
+
+// init date picker minimum
+if (customDateInput) {
+    const todayStr = new Date().toISOString().split("T")[0];
+    customDateInput.min = todayStr;
+}
+
+// apply button: change main target + save to localStorage
+if (customApplyBtn && customDateInput) {
+    customApplyBtn.addEventListener("click", () => {
+        if (!customDateInput.value) return;
+
+        const picked = new Date(customDateInput.value + "T00:00:00");
+        if (isNaN(picked.getTime())) return;
+
+        const now = new Date();
+        if (picked.getTime() <= now.getTime()) {
+            // don't allow past dates
+            return;
+        }
+
+        mainTarget = picked;
+
+        const labelText = (customLabelInput.value || "").trim();
+
+        try {
+            localStorage.setItem(STORED_TARGET_KEY, picked.toISOString());
+            localStorage.setItem(STORED_TARGET_LABEL_KEY, labelText);
+        } catch (e) {}
+
+        const h1 = document.querySelector(".title-row h1");
+        const subtitle = document.querySelector(".subtitle");
+        const dateText = picked.toLocaleDateString();
+        const labelToUse = labelText || dateText;
+
+        if (h1) {
+            h1.textContent = "Countdown to " + labelToUse;
+        }
+        if (subtitle) {
+            subtitle.textContent = "Time left until " + labelToUse + " from this very moment.";
+        }
+
+        customPanel.classList.add("hidden");
+    });
+}
+
+// on load: if we already have a saved target, apply it to mainTarget and heading
+(function restoreSavedTarget() {
+    try {
+        const savedISO = localStorage.getItem(STORED_TARGET_KEY);
+        const savedLabel = localStorage.getItem(STORED_TARGET_LABEL_KEY);
+        if (!savedISO) return;
+
+        const d = new Date(savedISO);
+        if (isNaN(d.getTime())) return;
+
+        mainTarget = d;
+        const h1 = document.querySelector(".title-row h1");
+        const subtitle = document.querySelector(".subtitle");
+        const dateText = d.toLocaleDateString();
+        const labelToUse = savedLabel || dateText;
+
+        if (h1) {
+            h1.textContent = "Countdown to " + labelToUse;
+        }
+        if (subtitle) {
+            subtitle.textContent = "Time left until " + labelToUse + " from this very moment.";
+        }
+
+        // pre-fill picker if available
+        if (customDateInput) {
+            customDateInput.value = savedISO.slice(0, 10);
+        }
+        if (customLabelInput && savedLabel) {
+            customLabelInput.value = savedLabel;
+        }
+    } catch (e) {}
+})();
+
+/* ===== Time on page counter ===== */
+var pageOpenedAt = Date.now();
+
+function updateTimeOnPage() {
+    var el = document.getElementById("time-on-page");
+    if (!el) return;
+
+    var diffMs = Date.now() - pageOpenedAt;
+    var totalSeconds = Math.floor(diffMs / 1000);
+    var minutes = Math.floor(totalSeconds / 60);
+    var seconds = totalSeconds % 60;
+
+    if (minutes > 0) {
+        el.textContent = "You've already spent " + minutes + " min " + seconds + "s on this page.";
+    } else {
+        el.textContent = "You've already spent " + seconds + " seconds on this page.";
+    }
+}
+
+/* ===== Reflection logic (last 5 intentions) ===== */
+
+const reflectionInput          = document.getElementById("reflection-input");
+const reflectionSave           = document.getElementById("save-reflection");
+const reflectionSaved          = document.getElementById("reflection-saved");
+const reflectionPrevious       = document.getElementById("reflection-previous");
+const reflectionPreviousContent= document.getElementById("reflection-previous-content");
+
+const REFLECTION_STORAGE_KEY = "time_reflection_list";
+
+function loadReflection() {
+    if (!window.localStorage) return;
+    let savedList;
+    try {
+        const raw = localStorage.getItem(REFLECTION_STORAGE_KEY);
+        savedList = raw ? JSON.parse(raw) : [];
+    } catch (e) {
+        savedList = [];
+    }
+
+    if (savedList && savedList.length && reflectionPrevious && reflectionPreviousContent) {
+        reflectionPrevious.style.display = "block";
+        reflectionPreviousContent.innerHTML = savedList
+            .slice(0, 5)
+            .map(text => "<div>• " + text + "</div>")
+            .join("");
+    }
+}
+
+if (reflectionSave && reflectionInput && reflectionSaved) {
+    reflectionSave.addEventListener("click", () => {
+        const text = reflectionInput.value.trim();
+        if (!text) {
+            reflectionSaved.textContent = "Write something first.";
+            reflectionSaved.style.color = "#f97373";
+            return;
+        }
+        if (window.localStorage) {
+            let savedList;
+            try {
+                const raw = localStorage.getItem(REFLECTION_STORAGE_KEY);
+                savedList = raw ? JSON.parse(raw) : [];
+            } catch (e) {
+                savedList = [];
+            }
+
+            savedList.unshift(text);
+            if (savedList.length > 5) {
+                savedList = savedList.slice(0, 5);
+            }
+
+            localStorage.setItem(REFLECTION_STORAGE_KEY, JSON.stringify(savedList));
+
+            if (reflectionPrevious && reflectionPreviousContent) {
+                reflectionPrevious.style.display = "block";
+                reflectionPreviousContent.innerHTML = savedList
+                    .map(t => "<div>• " + t + "</div>")
+                    .join("");
+            }
+        }
+        reflectionSaved.textContent = "Saved. Future you will thank you for this.";
+        reflectionSaved.style.color = "#6ee7b7";
+        reflectionInput.value = "";
+    });
+}
+
+/* ===== Initialization loops ===== */
+
+setInterval(updateCountdown, 33);   // ~30 FPS
+updateCountdown();
+
+setInterval(updateTimeOnPage, 1000);
+updateTimeOnPage();
+
+window.addEventListener("DOMContentLoaded", function () {
+    const quoteSection = document.querySelector(".quote-section");
+
+    if (window.IntersectionObserver && quoteSection) {
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    startTypewriter();
+                } else {
+                    resetTypewriter();
+                }
+            });
+        }, { threshold: 0.4 });
+
+        observer.observe(quoteSection);
+    } else {
+        setTimeout(startTypewriter, 1000);
+    }
+});
+
+// Load saved reflections after DOM is ready
+loadReflection();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>TimeWell Journal</title>
+  <link rel="stylesheet" href="assets/css/main.css">
+  <link rel="stylesheet" href="assets/css/journal.css">
+</head>
+<body class="page-root">
+
+  <div id="header-placeholder"></div>
+
+  <main class="page-main page-main-journal">
+    <div class="page-main-inner">
+
+      <section class="journal-layout">
+
+        <!-- LEFT SIDEBAR -->
+        <aside class="journal-sidebar">
+          <div class="journal-sidebar-header">
+            <h1 class="journal-title">Journal</h1>
+            <p class="journal-subtitle">Capture what future you shouldn&apos;t forget.</p>
+          </div>
+
+          <button id="journal-new-btn" class="journal-btn primary" type="button">
+            + New entry
+          </button>
+
+          <div class="journal-block">
+            <label class="journal-label" for="journal-search">Search</label>
+            <input id="journal-search" type="text" class="journal-input" placeholder="Words, phrases, feelings..." />
+          </div>
+
+          <div class="journal-block">
+            <div class="journal-label-row">
+              <span class="journal-label">Filter by date</span>
+            </div>
+            <div class="journal-date-row">
+              <input id="journal-from" type="date" class="journal-input journal-input-date" />
+              <span class="journal-date-sep">–</span>
+              <input id="journal-to" type="date" class="journal-input journal-input-date" />
+            </div>
+          </div>
+
+          <div class="journal-block">
+            <div class="journal-label-row">
+              <span class="journal-label">Tags</span>
+              <button id="journal-clear-filters" class="journal-link-btn" type="button">Clear filters</button>
+            </div>
+            <div class="journal-tags">
+              <label><input type="checkbox" class="journal-tag-filter" value="life" /> <span>Life</span></label>
+              <label><input type="checkbox" class="journal-tag-filter" value="work" /> <span>Work</span></label>
+              <label><input type="checkbox" class="journal-tag-filter" value="ideas" /> <span>Ideas</span></label>
+              <label><input type="checkbox" class="journal-tag-filter" value="goals" /> <span>Goals</span></label>
+              <label><input type="checkbox" class="journal-tag-filter" value="random" /> <span>Random</span></label>
+            </div>
+          </div>
+
+          <div class="journal-block journal-sort-block">
+            <label class="journal-label" for="journal-sort">Sort entries</label>
+            <select id="journal-sort" class="journal-input journal-select">
+              <option value="newest">Newest first</option>
+              <option value="oldest">Oldest first</option>
+              <option value="title">Title A–Z</option>
+            </select>
+          </div>
+
+        </aside>
+
+        <!-- RIGHT MAIN PANEL -->
+        <section class="journal-main">
+          <div class="journal-editor-card">
+            <header class="journal-editor-header">
+              <div class="journal-editor-meta">
+                <div id="journal-date-display" class="journal-date-display">New entry (not yet saved)</div>
+              </div>
+              <div class="journal-editor-status" id="journal-status">Autosave ready.</div>
+            </header>
+
+            <div class="journal-editor-fields">
+              <input
+                id="journal-title-input"
+                type="text"
+                class="journal-input journal-title-input"
+                placeholder="Give this moment a title..."
+              />
+              <textarea
+                id="journal-body-input"
+                class="journal-input journal-body-input"
+                placeholder="Write what happened, what you felt, what you learned..."
+              ></textarea>
+            </div>
+
+            <footer class="journal-editor-footer">
+              <div class="journal-tags-inline">
+                <span class="journal-label-inline">Tags:</span>
+                <label><input type="checkbox" class="journal-tag-input" value="life" /> <span>Life</span></label>
+                <label><input type="checkbox" class="journal-tag-input" value="work" /> <span>Work</span></label>
+                <label><input type="checkbox" class="journal-tag-input" value="ideas" /> <span>Ideas</span></label>
+                <label><input type="checkbox" class="journal-tag-input" value="goals" /> <span>Goals</span></label>
+                <label><input type="checkbox" class="journal-tag-input" value="random" /> <span>Random</span></label>
+              </div>
+              <div class="journal-editor-actions">
+                <button id="journal-save-btn" class="journal-btn primary" type="button">Save</button>
+                <button id="journal-delete-btn" class="journal-btn danger" type="button">Delete</button>
+                <button id="journal-export-btn" class="journal-btn subtle" type="button">Export all</button>
+              </div>
+            </footer>
+          </div>
+
+          <section class="journal-list-section">
+            <header class="journal-list-header">
+              <h2>Entries</h2>
+              <p id="journal-count" class="journal-count">No entries yet.</p>
+            </header>
+            <div id="journal-list" class="journal-list">
+              <!-- entries will be injected here -->
+            </div>
+          </section>
+        </section>
+
+      </section>
+    </div>
+  </main>
+
+  <div id="footer-placeholder"></div>
+
+  <script src="assets/js/layout.js" defer></script>
+  <script src="assets/js/journal.js" defer></script>
+</body>
+</html>
