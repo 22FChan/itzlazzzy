@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>MIDI Player | Inspiration Webpages</title>
+
+  <!-- Reuse your existing stylesheet if you have one -->
+  <link rel="stylesheet" href="/static/styles.css" />
+
+  <style>
+    /* Extra styles specific to this page (kept simple) */
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top left, #1c1f3b 0, #050712 50%, #020308 100%);
+      color: #f5f5f5;
+    }
+
+    .app-layout {
+      display: grid;
+      grid-template-columns: 260px minmax(0, 1fr);
+      width: 100%;
+    }
+
+    .sidebar {
+      border-right: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 1.8rem 1.4rem;
+      box-sizing: border-box;
+      backdrop-filter: blur(18px);
+      background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01));
+    }
+
+    .sidebar h1 {
+      font-size: 1.4rem;
+      margin: 0 0 0.5rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      opacity: 0.9;
+    }
+
+    .sidebar span.subtitle {
+      font-size: 0.8rem;
+      opacity: 0.7;
+    }
+
+    .sidebar .section-label {
+      margin-top: 1.8rem;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      opacity: 0.6;
+    }
+
+    .upload-card {
+      margin-top: 0.6rem;
+      padding: 1rem;
+      border-radius: 1rem;
+      background: rgba(5, 8, 24, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.55);
+    }
+
+    .upload-card p {
+      font-size: 0.85rem;
+      opacity: 0.85;
+      margin-top: 0.2rem;
+    }
+
+    .file-input-wrapper {
+      margin-top: 0.8rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+
+    .file-input {
+      padding: 0.5rem;
+      border-radius: 0.7rem;
+      border: 1px dashed rgba(255,255,255,0.25);
+      font-size: 0.85rem;
+      background: rgba(0,0,0,0.2);
+    }
+
+    .btn-primary {
+      border: none;
+      border-radius: 999px;
+      padding: 0.55rem 1.3rem;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      background: linear-gradient(135deg, #ff8a4a, #ff4b8b);
+      color: #fff;
+      box-shadow: 0 14px 30px rgba(255, 75, 139, 0.45);
+      transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.12s ease;
+      align-self: flex-start;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.05);
+      box-shadow: 0 18px 40px rgba(255, 75, 139, 0.6);
+    }
+
+    .btn-primary:active {
+      transform: translateY(0);
+      box-shadow: 0 10px 22px rgba(255, 75, 139, 0.4);
+    }
+
+    .main {
+      padding: 2rem 2.4rem;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      gap: 1.4rem;
+    }
+
+    .page-title {
+      font-size: 1.6rem;
+      font-weight: 600;
+      margin: 0;
+    }
+
+    .page-description {
+      font-size: 0.95rem;
+      opacity: 0.8;
+      margin-top: 0.3rem;
+      max-width: 36rem;
+    }
+
+    .card {
+      border-radius: 1.4rem;
+      padding: 1.6rem 1.4rem;
+      background: radial-gradient(circle at top left, rgba(255,255,255,0.16), rgba(0,0,0,0.8));
+      border: 1px solid rgba(255,255,255,0.12);
+      box-shadow: 0 22px 45px rgba(0, 0, 0, 0.7);
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 1rem;
+    }
+
+    .card-header h2 {
+      font-size: 1.1rem;
+      margin: 0;
+    }
+
+    .filename-label {
+      font-size: 0.85rem;
+      opacity: 0.8;
+    }
+
+    .filename-value {
+      font-weight: 500;
+    }
+
+    .status-text {
+      font-size: 0.85rem;
+      opacity: 0.85;
+    }
+
+    .status-text span {
+      font-weight: 500;
+    }
+
+    audio {
+      width: 100%;
+      margin-top: 0.4rem;
+      filter: drop-shadow(0 2px 8px rgba(0,0,0,0.7));
+    }
+
+    .error {
+      color: #ff6b8b;
+      font-size: 0.85rem;
+      margin-top: 0.4rem;
+    }
+
+    .hint {
+      font-size: 0.8rem;
+      opacity: 0.7;
+    }
+
+    @media (max-width: 800px) {
+      .app-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        border-right: none;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-layout">
+    <!-- LEFT SIDEBAR -->
+    <aside class="sidebar">
+      <h1>Inspiration Webpages</h1>
+      <span class="subtitle">MIDI Player</span>
+
+      <div class="section-label">Upload</div>
+      <div class="upload-card">
+        <p>Drop in any <strong>.mid</strong> file and the backend will synthesize it into audio for you.</p>
+
+        <form id="midiUploadForm" class="file-input-wrapper">
+          <input
+            id="midiFileInput"
+            class="file-input"
+            type="file"
+            name="file"
+            accept=".mid,.midi"
+            required
+          />
+
+          <button type="submit" class="btn-primary">
+            Render &amp; Play
+          </button>
+
+          <div class="hint">
+            Your MIDI never leaves your machine if you run this locally.
+          </div>
+        </form>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main">
+      <header>
+        <h2 class="page-title">MIDI Player</h2>
+        <p class="page-description">
+          This page uses your custom synth engine on the backend to turn uploaded MIDI files into audio.
+        </p>
+      </header>
+
+      <section class="card">
+        <div class="card-header">
+          <h2>Now Playing</h2>
+          <div class="filename-label">
+            File:
+            <span id="currentFilename" class="filename-value">none yet</span>
+          </div>
+        </div>
+
+        <p class="status-text">
+          Status: <span id="statusText">Waiting for upload…</span>
+        </p>
+
+        <audio id="midiPlayer" controls></audio>
+
+        <div id="errorBox" class="error" style="display: none;"></div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const form = document.getElementById("midiUploadForm");
+    const fileInput = document.getElementById("midiFileInput");
+    const audioEl = document.getElementById("midiPlayer");
+    const filenameEl = document.getElementById("currentFilename");
+    const statusEl = document.getElementById("statusText");
+    const errorBox = document.getElementById("errorBox");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      errorBox.style.display = "none";
+      errorBox.textContent = "";
+
+      const file = fileInput.files[0];
+      if (!file) {
+        return;
+      }
+
+      filenameEl.textContent = file.name;
+      statusEl.textContent = "Rendering on backend…";
+
+      const formData = new FormData();
+      formData.append("file", file);
+
+      try {
+        const response = await fetch("https://itzlazzzy-backend.onrender.com/api/midi-to-audio", {
+          method: "POST",
+          body: formData,
+        });
+
+        if (!response.ok) {
+          let message = "Unknown error";
+          try {
+            const data = await response.json();
+            message = data.error || message;
+          } catch (_) {}
+
+          statusEl.textContent = "Error";
+          errorBox.textContent = message;
+          errorBox.style.display = "block";
+          return;
+        }
+
+        const blob = await response.blob();
+        const url = URL.createObjectURL(blob);
+
+        audioEl.src = url;
+        statusEl.textContent = "Ready. Press play or it may auto-start.";
+        audioEl.play().catch(() => {
+          // Some browsers block autoplay; just ignore.
+        });
+      } catch (err) {
+        statusEl.textContent = "Error";
+        errorBox.textContent = "Network or server error: " + err.message;
+        errorBox.style.display = "block";
+      }
+    });
+  </script>
+</body>
+</html>

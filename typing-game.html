@@ -1,0 +1,125 @@
+  <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Typing Trainer Game</title>
+  <link rel="stylesheet" href="assets/css/typing-game.css">
+</head>
+<body>
+  <div class="game-container">
+    <div class="header">
+      <div>
+        <div class="title">
+          Typing Trainer
+          <span class="badge">Smart Practice</span>
+        </div>
+        <div class="subtitle">
+          Mistyped words are automatically added to your practice list.
+        </div>
+      </div>
+
+      <div class="header-right">
+        <div class="mode-switch">
+          <button class="mode-button active" data-mode="game">Game</button>
+          <button class="mode-button" data-mode="practice">Practice</button>
+        </div>
+        <div class="header-controls">
+          <label class="difficulty-label">
+            Difficulty:
+            <select id="difficultySelect">
+              <option value="any">Any</option>
+              <option value="short">Short</option>
+              <option value="long">Long</option>
+            </select>
+          </label>
+          <button class="small-button" id="startGameButton">Start Game</button>
+          <div class="music-controls">
+            <button class="small-button" id="prevTrackButton">Prev</button>
+            <span class="track-name" id="trackName">Track: Off</span>
+            <button class="small-button" id="nextTrackButton">Next</button>
+            <button class="small-button" id="musicToggle">Play</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="main">
+      <!-- LEFT: Main typing area -->
+      <div class="card playfield-card">
+        <div class="hud">
+          <div class="hud-section">
+            <span class="hud-label">Score</span>
+            <span class="hud-value" id="scoreDisplay">0</span>
+          </div>
+          <div class="hud-section">
+            <span class="hud-label">WPM</span>
+            <span class="hud-value" id="statWpm">0</span>
+          </div>
+          <div class="hud-section">
+            <span class="hud-label">Time</span>
+            <span class="hud-value" id="statTime">60s</span>
+          </div>
+          <div class="hud-section">
+            <span class="hud-label">Hearts</span>
+            <span class="hud-value" id="hearts"></span>
+          </div>
+        </div>
+
+        <div class="playfield">
+          <div class="word-display-label">Type this word</div>
+          <div class="word-display" id="wordDisplay">loading...</div>
+
+          <div class="player" id="player">
+            <div class="player-body"></div>
+          </div>
+        </div>
+
+        <div class="feedback info" id="feedback"></div>
+
+        <div class="stats-row">
+          <div class="stat-pill">
+            Correct: <strong id="statCorrect">0</strong>
+          </div>
+          <div class="stat-pill">
+            Wrong: <strong id="statWrong">0</strong>
+          </div>
+          <div class="stat-pill">
+            Accuracy: <strong id="statAccuracy">0%</strong>
+          </div>
+          <div class="stat-pill">
+            Mode streak: <strong id="statStreak">0</strong>
+          </div>
+        </div>
+        <div class="hint">
+          Game mode: you have 60 seconds. Just start typing – letters change directly in the word.
+          Use <strong>Backspace</strong> to fix mistakes.
+        </div>
+      </div>
+
+      <!-- RIGHT: Practice list & info -->
+      <div class="card side-card">
+        <div class="practice-header">
+          <div>
+            <div class="practice-title">Practice List</div>
+            <div class="practice-subtitle">
+              Words you often miss will appear here automatically.
+            </div>
+          </div>
+          <button class="small-button" id="clearPracticeButton">Clear list</button>
+        </div>
+
+        <div id="practiceWordsContainer"></div>
+        <div class="threshold-info">
+          A word is added after
+          <strong id="thresholdInfo">3</strong> mistakes in total.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Background music (source changed dynamically) -->
+  <audio id="bgMusic" loop preload="auto"></audio>
+
+  <script src="assets/js/typing-game.js" defer></script>
+</body>
+</html>
