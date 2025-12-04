@@ -1,0 +1,1443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>TimeWell | PDF Viewer</title>
+  <link rel="stylesheet" href="assets/css/main.css">
+  <link rel="stylesheet" href="assets/css/pdf_viewer.css">
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js" defer></script>
+  <script src="assets/js/layout.js" defer></script>
+  <script src="assets/js/pdf_viewer.js" defer></script>
+</head>
+<body class="page-root pdf-page" data-bg="aurora">
+  <div id="header-placeholder"></div>
+  <main class="page-main pdf-main">
+    <div class="page-main-inner pdf-shell">
+      <div class="viewer-container">
+
+        <div class="thumbnail-sidebar" id="thumbnailSidebar"></div>
+
+        <div class="viewer-main">
+          <div class="toolbar">
+            <button id="zoomOut">-</button>
+            <button id="zoomIn">+</button>
+            <button id="zoomReset">Reset</button>
+            <button id="fitWidth">Fit Width</button>
+            <button id="fitPage">Fit Page</button>
+            <button id="settingsButton" class="toolbar-settings">
+              <svg class="settings-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 0 0 2.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 0 0 1.065 2.572c1.757.426 1.757 2.924 0 3.35a1.724 1.724 0 0 0-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 0 0-2.572 1.065c-.426 1.757-2.924 1.757-3.35 0a1.724 1.724 0 0 0-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 0 0-1.065-2.572c-1.757-.426-1.757-2.924 0-3.35a1.724 1.724 0 0 0 1.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065Z"></path>
+                <path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"></path>
+              </svg>
+              <span>Settings</span>
+            </button>
+          </div>
+          <div class="settings-panel" id="settingsPanel" aria-hidden="true">
+            <div class="settings-header">
+              <div class="settings-title">View Settings</div>
+              <button class="settings-close" id="settingsClose" aria-label="Close settings">&times;</button>
+            </div>
+            <div class="settings-row">
+              <div>
+                <div class="settings-label">Glow</div>
+                <p class="settings-helper">Toggle glow on headings and accents.</p>
+              </div>
+              <label class="glow-toggle" aria-label="Toggle glow">
+                <input type="checkbox" id="glowSwitch" checked>
+                <span class="glow-track"></span>
+                <span class="glow-thumb"></span>
+              </label>
+            </div>
+            <div class="settings-row">
+              <div class="settings-label">Backdrop</div>
+              <div class="color-choices" role="group" aria-label="Backdrop colors">
+                <button class="color-chip active" data-bg-choice="aurora" aria-label="Aurora background" style="--swatch: linear-gradient(120deg, #22d3ee, #4efce4)"><span></span><span class="sr-only">Aurora</span></button>
+                <button class="color-chip" data-bg-choice="midnight" aria-label="Midnight background" style="--swatch: linear-gradient(120deg, #0f172a, #0ea5e9)"><span></span><span class="sr-only">Midnight</span></button>
+                <button class="color-chip" data-bg-choice="paper" aria-label="Paper background" style="--swatch: linear-gradient(120deg, #f8fafc, #cbd5f5)"><span></span><span class="sr-only">Paper</span></button>
+                <button class="color-chip" data-bg-choice="dusk" aria-label="Dusk background" style="--swatch: linear-gradient(120deg, #1a1034, #4338ca)"><span></span><span class="sr-only">Dusk</span></button>
+                <button class="color-chip" data-bg-choice="neon" aria-label="Neon background" style="--swatch: linear-gradient(120deg, #0ea5e9, #67e8f9)"><span></span><span class="sr-only">Neon</span></button>
+              </div>
+            </div>
+            <div class="settings-row">
+              <div class="settings-label">Text</div>
+              <div class="color-choices" role="group" aria-label="Text colors">
+                <button class="color-chip active" data-text-color="#cbd5f5" aria-label="Soft teal text" style="--swatch: #cbd5f5"><span></span><span class="sr-only">Soft teal</span></button>
+                <button class="color-chip" data-text-color="#e2e8f0" aria-label="Frost text" style="--swatch: #e2e8f0"><span></span><span class="sr-only">Frost</span></button>
+                <button class="color-chip" data-text-color="#f8fafc" aria-label="Paper text" style="--swatch: #f8fafc"><span></span><span class="sr-only">Paper</span></button>
+                <button class="color-chip" data-text-color="#d1fae5" aria-label="Mint text" style="--swatch: #d1fae5"><span></span><span class="sr-only">Mint</span></button>
+                <button class="color-chip" data-text-color="#0f172a" aria-label="Ink text" style="--swatch: #0f172a"><span></span><span class="sr-only">Ink</span></button>
+              </div>
+            </div>
+            <div class="settings-row">
+              <div class="settings-label">Page</div>
+              <div class="color-choices" role="group" aria-label="Page backgrounds">
+                <button class="color-chip active" data-page-bg="linear-gradient(180deg, rgba(9, 18, 26, 0.98), rgba(5, 9, 14, 0.98))" aria-label="Deep page background" style="--swatch: linear-gradient(180deg, #0b141d, #060a11)"><span></span><span class="sr-only">Deep</span></button>
+                <button class="color-chip" data-page-bg="linear-gradient(180deg, #0f172a, #0b1220)" aria-label="Indigo page background" style="--swatch: linear-gradient(180deg, #1e293b, #111827)"><span></span><span class="sr-only">Indigo</span></button>
+                <button class="color-chip" data-page-bg="#0b1218" aria-label="Charcoal page background" style="--swatch: #0b1218"><span></span><span class="sr-only">Charcoal</span></button>
+                <button class="color-chip" data-page-bg="#111827" aria-label="Slate page background" style="--swatch: #111827"><span></span><span class="sr-only">Slate</span></button>
+                <button class="color-chip" data-page-bg="#f8fafc" aria-label="Paper page background" style="--swatch: #f8fafc"><span></span><span class="sr-only">Paper</span></button>
+              </div>
+            </div>
+          </div>
+          <div class="page-grid">
+            <div class="page">
+              <div class="title-page">
+                <h1>COMPLETE AUDIO ENGINEERING<br/>& DIGITAL SIGNAL PROCESSING<br/>TEXTBOOK</h1>
+                <p><strong>A Comprehensive Technical Reference</strong></p>
+                <p>Covering: Acoustics �?� Digital Audio �?� Frequency Analysis �?� Filters<br/>
+                Synthesis �?� Music Theory �?� Effects �?� Machine Learning �?� Advanced DSP</p>
+                <p style="margin-top: 100px; font-size: 12pt;">Full Technical Documentation<br/>From Fundamentals to Research-Level Topics</p>
+              </div>
+            </div>
+
+            <div class="page">
+              <h1>TABLE OF CONTENTS</h1>
+
+              <div style="column-count: 2; column-gap: 30px; font-size: 11pt;">
+              <p><strong>SECTION 1</strong> �?" Acoustics & Physics of Sound</p>
+              <p><strong>SECTION 2</strong> �?" Digital Audio</p>
+              <p><strong>SECTION 3</strong> �?" Frequency Domain & FFT</p>
+              <p><strong>SECTION 4</strong> �?" Digital Filters & Systems</p>
+              <p><strong>SECTION 5</strong> �?" Sound Synthesis & Timbre</p>
+              <p><strong>SECTION 6</strong> �?" Music Theory for DSP</p>
+              <p><strong>SECTION 7</strong> �?" Mixing, Mastering & Effects</p>
+              <p><strong>SECTION 8</strong> �?" Psychoacoustics & Hearing</p>
+              <p><strong>SECTION 9</strong> �?" Effects Design & DSP</p>
+              <p><strong>SECTION 10</strong> �?" Machine Learning for Audio</p>
+              <p><strong>SECTION 11</strong> �?" Advanced DSP Research</p>
+              <p><strong>SECTION 12</strong> �?" Implementation & System Design</p>
+              <p><strong>INDEX</strong> �?" Complete Reference</p>
+              </div>
+              <div class="section-break"></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+  <div id="footer-placeholder"></div>
+<div id="raw-content" style="display:none;">
+    <h1>SECTION 1 – ACOUSTICS & THE PHYSICS OF SOUND</h1>
+
+    <h2>1.1 What is Sound?</h2>
+
+    <p>Sound is a mechanical vibration that travels through a medium (air, water, metal) as a pressure wave. It requires three essential components:</p>
+
+    <ul>
+    <li>a source</li>
+    <li>a medium</li>
+    <li>a receiver</li>
+    </ul>
+
+    <p>Sound cannot exist in a vacuum because there is no matter to compress.</p>
+
+    <p>There are two main kinds of mechanical waves:</p>
+
+    <ol>
+    <li><strong>Longitudinal waves</strong>: particles move back and forth along the direction of wave travel (air waves).</li>
+    <li><strong>Transverse waves</strong>: particles move perpendicular to wave travel (strings, membranes).</li>
+    </ol>
+
+    <p>Human hearing typically spans from 20 Hz to 20 kHz. Below that is infrasound; above is ultrasound.</p>
+
+    <h2>1.2 Pressure, Displacement, and Medium Mechanics</h2>
+
+    <p>Sound travels via alternating regions of compression (high pressure) and rarefaction (low pressure). These fluctuations travel outward from the source. Individual air molecules oscillate around fixed positions—they do not travel long distances with the wave.</p>
+
+    <p>The wave equation describing propagation is:</p>
+
+    <div class="formula">
+    ∂²p/∂t² = c² ∇²p
+    </div>
+
+    <p>where p is pressure, c is speed of sound, ∇² is the Laplacian.</p>
+  
+    <p>Speed of sound depends on medium elasticity and density. Approximate values:</p>
+
+    <ul>
+    <li>air: ~343 m/s</li>
+    <li>water: ~1480 m/s</li>
+    <li>steel: ~5000 m/s</li>
+    </ul>
+
+  
+    <h2>1.3 Frequency, Period, and Pitch</h2>
+
+    <p>Frequency f is measured in Hertz (cycles per second). Period T = 1/f.</p>
+
+    <p>Low frequency → slow oscillation → "bass". High frequency → fast oscillation → "treble".</p>
+
+    <p>Pitch corresponds roughly to frequency but is also influenced by harmonic structure, loudness, time evolution, and auditory system nonlinearity.</p>
+  
+
+    <h2>1.4 Amplitude, Loudness, and Sound Pressure Level (SPL)</h2>
+
+    <p>Amplitude refers to maximum pressure deviation from the mean. Human loudness perception is nonlinear; we perceive loudness approximately logarithmically.</p>
+
+    <p>Sound pressure level:</p>
+
+    <div class="formula">
+    SPL(dB) = 20 log₁₀(P / Pref)
+    where Pref = 20 µPa (threshold of hearing)
+    </div>
+
+    <p>Every +6 dB ≈ double amplitude. Every +10 dB ≈ double perceived loudness.</p>
+
+    <h2>1.5 Wavelength and Wave Propagation</h2>
+
+    <div class="formula">
+    λ = c / f
+    </div>
+
+    <p>Low frequencies → long wavelengths → travel far and diffract around obstacles. High frequencies → short wavelengths → directional and easily absorbed.</p>
+
+    <p>Wavelength examples in air:</p>
+
+    <ul>
+    <li>50 Hz → ~6.8 m</li>
+    <li>1 kHz → ~0.34 m</li>
+    <li>10 kHz → ~0.034 m</li>
+    </ul>
+
+    <h2>1.6 Simple Harmonic Motion & Sinusoidal Waves</h2>
+
+    <p>A pure tone is a sine wave:</p>
+
+    <div class="formula">
+    x(t) = A sin(2πft + φ)
+
+    A = amplitude
+    f = frequency
+    φ = phase
+    </div>
+
+    <p>Sine waves are building blocks of all periodic signals (Fourier theory). They contain no harmonics, only one frequency.</p>
+
+    <h2>1.7 Harmonics, Partials, and Overtones</h2>
+
+    <p>Harmonics occur at integer multiples of a fundamental frequency f₀:</p>
+
+    <div class="formula">
+    1st harmonic = f₀
+    2nd harmonic = 2f₀
+    3rd harmonic = 3f₀
+    ...
+    </div>
+
+    <p>Partials = any distinct frequency components. Overtones = partials above the fundamental.</p>
+
+    <p>Harmonic spectrum determines tone/timbre. Harmonic instruments include strings, brass, and woodwinds. Inharmonic instruments include bells, drums, and metal percussion.</p>
+
+    <h2>1.8 Timbre: Why Instruments Sound Different</h2>
+
+    <p>Timbre is determined by:</p>
+
+    <ul>
+    <li>harmonic pattern</li>
+    <li>spectral envelope</li>
+    <li>attack/decay shape</li>
+    <li>presence of noise</li>
+    <li>inharmonicity</li>
+    <li>modulation and vibrato</li>
+    <li>time evolution of harmonics</li>
+    </ul>
+
+    <p>Two instruments with the same pitch and loudness sound different because of these details.</p>
+
+    <h2>1.9 Wave Addition, Interference, and Superposition</h2>
+
+    <p>The principle of superposition states that wave amplitudes add linearly. Constructive interference occurs when waves add; destructive interference occurs when waves cancel.</p>
+
+    <p>Superposition governs beating patterns, standing waves, phase cancellation, and room resonances. If two frequencies are close, the beat frequency = |f₁ − f₂|.</p>
+
+    <h2>1.10 Standing Waves, Resonance, and Modes</h2>
+
+    <p>Standing waves occur when reflected waves overlap with incoming ones. Nodes are areas of minimal movement; antinodes are areas of maximal movement.</p>
+
+    <p>Resonance occurs when excitation matches a system's natural frequency. Examples include guitar string modes, air column modes in flutes, room resonances, and timpani drum modal patterns.</p>
+
+    <p>Room resonances create modal peaks at:</p>
+
+    <div class="formula">
+    f = c/2 √((nx/Lx)² + (ny/Ly)² + (nz/Lz)²)
+    </div>
+
+    <div class="section-break"></div>
+  
+    <h1>SECTION 2 – DIGITAL AUDIO</h1>
+
+    <h2>2.0 Introduction to Digital Audio</h2>
+
+    <p>Digital Audio is the process of turning continuous pressure waves into numbers. Key concepts include:</p>
+
+    <ul>
+    <li>The analog world is continuous</li>
+    <li>Computers are discrete</li>
+    <li>Conversion requires rules</li>
+    <li>Some things are lost, others preserved</li>
+    <li>Digital audio is mathematical and precise</li>
+    </ul>
+
+    <h2>2.1 Sampling Theory: Turning Time Into Numbers</h2>
+
+    <h3>2.1.1 What is Sampling?</h3>
+
+    <p>Sampling means taking measurements of a waveform at regular intervals.</p>
+
+    <div class="ascii-art">continuous wave → *  *  *  *  *
+                    →  ↑  ↑  ↑  ↑
+                samples at fixed times</div>
+
+    <p>Let Fs = sampling rate (samples per second) and Ts = 1/Fs = sampling interval.</p>
+
+    <p>Common Fs values:</p>
+
+    <ul>
+    <li>44.1 kHz (music, CD)</li>
+    <li>48 kHz (video, streaming)</li>
+    <li>96 kHz (high-end recording)</li>
+    <li>192 kHz (engineering / ultrasonic work)</li>
+    </ul>
+
+    <h3>2.1.2 The Nyquist Frequency</h3>
+
+    <p>The maximum frequency that can be represented is:</p>
+
+    <div class="formula">
+    Nyquist = Fs / 2
+    </div>
+
+    <table>
+    <tr><th>Sample Rate</th><th>Nyquist Limit</th></tr>
+    <tr><td>44,100 Hz</td><td>22,050 Hz</td></tr>
+    <tr><td>48,000 Hz</td><td>24,000 Hz</td></tr>
+    <tr><td>96,000 Hz</td><td>48,000 Hz</td></tr>
+    </table>
+
+    <h3>2.1.3 What Happens If Frequency > Nyquist? (Aliasing)</h3>
+
+    <p>Aliasing occurs when high frequencies fold back into lower frequencies as wrong tones. Aliasing cannot be undone—this is why anti-aliasing filters exist.</p>
+
+    <h2>2.2 Quantization: Turning Amplitude Into Numbers</h2>
+
+    <p>After sampling in time, we must also quantize amplitude. Quantization means rounding to the nearest discrete amplitude step.</p>
+
+    <h3>2.2.1 Bit Depth</h3>
+
+    <p>Bit depth determines how many binary digits are used per sample:</p>
+
+    <ul>
+    <li><strong>16-bit (CD)</strong> → 65,536 values</li>
+    <li><strong>24-bit (pro audio)</strong> → 16.7 million values</li>
+    <li><strong>32-bit float</strong> → even larger dynamic range</li>
+    </ul>
+
+    <h3>2.2.2 Quantization Noise</h3>
+
+    <p>Rounding introduces error perceived as noise. More bits → lower noise → larger dynamic range.</p>
+
+    <p>Approximate dynamic range:</p>
+
+    <div class="formula">
+    DR (dB) ≈ 6.02 × bits
+    </div>
+
+    <p>Examples: 16-bit → ~96 dB; 24-bit → ~144 dB</p>
+
+    <h3>2.2.3 Dither</h3>
+
+    <p>Dither means adding tiny noise on purpose before quantization to prevent distortion and convert quantization error into gentle noise. It's used in mastering when going from 24-bit → 16-bit.</p>
+
+    <h2>2.15 The Sampling Theorem (Full Intuition)</h2>
+
+    <p>The <strong>Nyquist-Shannon sampling theorem</strong> states: A bandlimited signal with no energy above Fs/2 can be perfectly reconstructed from its samples.</p>
+
+    <h3>2.15.1 What does "bandlimited" mean?</h3>
+
+    <p>A signal is bandlimited if X(f) = 0 for |f| > B, where B is some finite cutoff frequency.</p>
+
+    <h3>2.15.2 Sampling = multiplying by a pulse train</h3>
+
+    <p>Mathematically:</p>
+
+    <div class="formula">
+    x_s(t) = x(t) · Σ δ(t − nTs)
+    </div>
+
+    <p>Where Ts = 1/Fs, the sampling interval. Multiplying by impulses in time becomes replication in frequency.</p>
+
+    <h3>2.15.3 Nyquist condition: Fs ≥ 2B</h3>
+
+    <p>For the replicated spectra not to overlap: Fs − B > B → Fs > 2B. This gives us the usual condition: Fs ≥ 2 × highest frequency.</p>
+
+    <div class="section-break"></div>
+
+    <h1>SECTION 3 – FREQUENCY DOMAIN & FFT</h1>
+
+    <h2>3.1 Time Domain vs Frequency Domain</h2>
+
+    <p>Time domain shows amplitude as a function of time: x(t) or x[n]. Frequency domain shows amplitude/phase as a function of frequency: X(f) or X[k].</p>
+
+    <p>Time-domain displays loudness, waveform shape, and transients. Frequency-domain reveals pitch, harmonics, timbre, and spectral balance.</p>
+
+    <h2>3.2 The Discrete Fourier Transform (DFT)</h2>
+
+    <p>DFT formula:</p>
+
+    <div class="formula">
+    X[k] = Σ x[n] · e^(−j2πkn/N)
+    </div>
+
+    <p>Inverse DFT:</p>
+
+    <div class="formula">
+    x[n] = (1/N) Σ X[k] · e^(+j2πkn/N)
+    </div>
+
+    <p>Interpretation: Each X[k] represents how much of the frequency k*(Fs/N) is in the signal. X[k] is complex = magnitude + phase.</p>
+
+    <h2>3.3 FFT: Fast Fourier Transform</h2>
+
+    <p>FFT is an optimized DFT, reducing computation from O(N²) → O(N log N). This enables digital EQ, convolution reverb, spectral editing, vocoders, pitch detection, and spectrograms.</p>
+
+    <p>FFT returns complex numbers: Re + jIm</p>
+
+    <p>Magnitude: |X| = sqrt(Re² + Im²)</p>
+    <p>Phase: φ = atan2(Im, Re)</p>
+
+    <h2>3.4 Frequency Bins & Resolution</h2>
+
+    <p>Bin frequency:</p>
+
+    <div class="formula">
+    f_bin = k * (Fs / N)
+    </div>
+
+    <p>Frequency resolution:</p>
+
+    <div class="formula">
+    Δf = Fs / N
+    </div>
+
+    <p>Larger N → better frequency resolution but slower and more latency.</p>
+
+    <p>Example: Fs = 48000, N=2048 → Δf = ~23.4 Hz</p>
+
+    <h2>3.10 STFT (Short-Time Fourier Transform)</h2>
+
+    <p>STFT applies FFT repeatedly over overlapping windows. This creates a spectrogram showing magnitude of each frame.</p>
+
+    <p>Parameters include window size N, hop size H, window type, and overlap. Larger N provides better frequency resolution; smaller hop provides better time resolution. The time-frequency tradeoff is fundamental.</p>
+
+    <div class="section-break"></div>
+
+    <h1>SECTION 4 – DIGITAL FILTERS, SYSTEMS & SIGNAL MODELLING</h1>
+
+    <h2>4.1 Introduction to Digital Filters</h2>
+
+    <p>A digital filter transforms a discrete input signal x[n] into an output y[n] using a difference equation.</p>
+
+    <p>General form:</p>
+
+    <div class="formula">
+    y[n] = Σ b_k x[n−k] − Σ a_k y[n−k]
+    </div>
+
+    <p>Two major classes: FIR (finite impulse response) and IIR (infinite impulse response).</p>
+
+    <p>Filters serve many purposes: EQ, crossover networks, smoothing, noise reduction, audio effects, and scientific DSP.</p>
+
+    <h2>4.2 FIR Filters (Finite Impulse Response)</h2>
+
+    <p>FIR filters have finite-length impulse responses.</p>
+
+    <p>General FIR equation:</p>
+
+    <div class="formula">
+    y[n] = Σ b_k x[n−k]
+    </div>
+
+    <p>Properties:</p>
+    <ul>
+    <li>always stable</li>
+    <li>can be linear phase</li>
+    <li>direct convolution interpretation</li>
+    </ul>
+
+    <p>Design methods include windowed-sinc, frequency sampling, Parks–McClellan (equiripple), and least-squares filter design.</p>
+
+    <h2>4.4 IIR Filters (Infinite Impulse Response)</h2>
+
+    <p>IIR filters use feedback in their difference equations:</p>
+
+    <div class="formula">
+    y[n] = Σ b_k x[n−k] − Σ a_k y[n−k]
+    </div>
+
+    <p>Properties:</p>
+    <ul>
+    <li>very efficient</li>
+    <li>sharp frequency response</li>
+    <li>can become unstable</li>
+    <li>non-linear phase</li>
+    </ul>
+
+    <p>Common designs include Butterworth (smooth), Chebyshev I & II (steeper), Elliptic (steepest), and Biquads (2nd-order sections).</p>
+
+    <h2>4.5 Biquad Filters (2nd-Order IIR Sections)</h2>
+
+    <p>Biquad filters are standard in audio DSP.</p>
+
+    <p>Structure:</p>
+
+    <div class="formula">
+    y[n] = b0 x[n] + b1 x[n−1] + b2 x[n−2]
+          − a1 y[n−1] − a2 y[n−2]
+    </div>
+
+    <p>Used for parametric EQ, low/high shelf, peaking EQ, low-pass, high-pass, notch filters, and band-pass filtering.</p>
+
+    <div class="section-break"></div>
+
+    <h1>SECTION 5 – SOUND SYNTHESIS & TIMBRE MODELLING</h1>
+
+    <h2>5.1 Fundamentals of Sound Synthesis</h2>
+
+    <p>Synthesis means generating sound using mathematical or physical models. Main synthesis categories include:</p>
+
+    <ul>
+    <li>Additive</li>
+    <li>Subtractive</li>
+    <li>FM/PM</li>
+    <li>Wavetable</li>
+    <li>Physical modeling</li>
+    <li>Granular</li>
+    <li>Sampling</li>
+    </ul>
+
+    <h2>5.2 Additive Synthesis</h2>
+
+    <p>Additive synthesis is based on summing sinusoidal partials:</p>
+
+    <div class="formula">
+    x(t) = Σ A_k(t) · sin(2π f_k(t) t + φ_k(t))
+    </div>
+
+    <p>Parameters include amplitudes, frequencies, and phases. Models can be harmonic additive, inharmonic additive, or use time-varying envelopes.</p>
+
+    <p>Used for organ sounds, bells, pads, and spectral morphing.</p>
+
+    <h2>5.3 Subtractive Synthesis</h2>
+
+    <p>Subtractive synthesis starts with harmonically rich waveforms (saw, square, triangle, or noise) and then shapes them with filters (low-pass, band-pass, formant filters, or resonators).</p>
+
+    <p>Typical subtractive synth path:</p>
+
+    <div class="formula">
+    Oscillator → Filter → Amplifier → Output
+    </div>
+
+    <p>Modulation sources include LFOs, envelopes, key tracking, and velocity.</p>
+
+    <h2>5.4 FM Synthesis (Frequency Modulation)</h2>
+
+    <p>FM synthesis uses a carrier and modulator:</p>
+
+    <div class="formula">
+    Carrier: c(t) = sin(2π f_c t)
+    Modulator: m(t) = sin(2π f_m t)
+    FM output: y = sin(2π f_c t + I sin(2π f_m t))
+    </div>
+
+    <p>Where I = modulation index (controls brightness). This produces sidebands at frequencies f_c ± n f_m.</p>
+
+    <p>Used for electric piano, metallic tones, bells, and complex evolving timbre.</p>
+
+    <h2>5.6 Wavetable Synthesis</h2>
+
+    <p>A table stores a cycle of a waveform in buffer[n]. A phase accumulator picks values:</p>
+
+    <div class="formula">
+    phase += freq/Fs
+    output = buffer[floor(phase * table_size)]
+    </div>
+
+    <p>Features include morphing between tables, multi-dimensional tables, and anti-aliased tables. Used in Serum, Vital, Massive, and PPG Wave synthesizers.</p>
+
+    <div class="section-break"></div>
+
+    <h1>SECTION 7 – MIXING, MASTERING, EFFECTS & REAL-WORLD AUDIO</h1>
+
+    <h2>7.1 Gain Staging & Levels</h2>
+
+    <p>Digital audio has a strict range: -1.0 to +1.0 (float), where 0 dBFS = maximum digital amplitude.</p>
+
+    <p>Gain staging ensures no clipping, no noise floor issues, and that plugins operate optimally.</p>
+
+    <p>Recommended practice:</p>
+    <ul>
+    <li>leave 6–12 dB headroom on tracks</li>
+    <li>leave 6 dB on master</li>
+    <li>peaks under −6 dBFS</li>
+    </ul>
+
+    <h2>7.3 Compression</h2>
+
+    <p>Compression reduces dynamic range. Parameters include ratio, threshold, attack, release, knee, and makeup gain.</p>
+
+    <p>Basic formula:</p>
+
+    <div class="formula">
+    if x > T:  y = T + (x−T)/R
+    else       y = x
+    </div>
+
+    <p>Types of compressors include VCA (fast, precise), Opto (smooth), FET (aggressive), Vari-Mu (tube, warm), and Digital lookahead.</p>
+
+    <p>Use-cases include vocals, drums, bass, buses, and glue compression.</p>
+
+    <h2>7.7 Reverb</h2>
+
+    <p>Reverb simulates acoustic space. Main components include early reflections, late reverberation, and decay time (RT60).</p>
+
+    <p>Reverb types:</p>
+    <ul>
+    <li>convolution (uses IRs)</li>
+    <li>algorithmic (Schroeder, FDN)</li>
+    <li>plate</li>
+    <li>spring</li>
+    <li>chamber</li>
+    <li>hall</li>
+    </ul>
+
+    <p>Reverb controls include pre-delay, size, damping, mix, and diffusion.</p>
+
+    <div class="section-break"></div>
+
+    <h1>SECTION 10 – MACHINE LEARNING FOR AUDIO, MUSIC & DSP</h1>
+
+    <h2>10.1 Audio Features for Machine Learning</h2>
+
+    <p>ML models typically work with audio representations rather than raw audio. Common features include:</p>
+
+    <ul>
+    <li>STFT magnitude</li>
+    <li>log-mel spectrogram</li>
+    <li>mel-frequency cepstral coefficients (MFCCs)</li>
+    <li>chroma features</li>
+    <li>spectral centroid / bandwidth / rolloff / flux</li>
+    <li>zero-crossing rate</li>
+    <li>spectral envelope</li>
+    </ul>
+
+    <p>Log-mel spectrogram is the standard for ML:</p>
+
+    <div class="formula">
+    audio → STFT → mel filterbank → log(energy)
+    </div>
+
+    <h2>10.2 Deep Learning for Audio</h2>
+
+    <p>Neural architectures used in audio processing:</p>
+
+    <h3>CNNs (Convolutional Neural Networks)</h3>
+
+    <p>Used for spectrogram classification, instrument recognition, sound effects classification, pitch estimation, and spectrogram enhancement. CNN filters act like temporal filters and time-frequency pattern detectors.</p>
+
+    <h3>RNNs (Recurrent Neural Networks)</h3>
+
+    <p>Used for music generation, sequence modeling, and speech recognition. Variants include LSTM and GRU.</p>
+
+    <h3>Transformers (Attention Models)</h3>
+
+    <p>Now the most powerful sequence models. Used for large-scale music modeling, audio understanding, source separation, and multi-modal models (audio + text).</p>
+
+    <p>Self-attention determines global relationships across entire audio sequences.</p>
+
+    <h2>10.7 Neural Synthesis (DDSP, GANs, Diffusion)</h2>
+
+    <p>Modern synthesis uses ML to generate or transform sounds.</p>
+
+    <h3>DDSP (Differentiable DSP)</h3>
+
+    <p>Uses differentiable filters and oscillators. The model learns control signals for DSP modules, providing extremely high quality. Used for voice conversion & instrument reconstruction.</p>
+
+    <h3>GAN-based synthesis</h3>
+
+    <p>Adversarial training generates textures, drum hits, and transients.</p>
+
+    <h3>Diffusion Models</h3>
+
+    <p>Current state-of-the-art includes AudioLDM, DiffWave, and Stable Audio. Process: noise → iterative denoise → audio.</p>
+
+    <div class="section-break"></div>
+
+    <h1>SECTION 12 – PRACTICAL IMPLEMENTATION &amp; SYSTEM DESIGN</h1>
+
+    <h2>12.1 Real-Time Audio Constraints</h2>
+
+    <p>Real-time audio processing has strict requirements:</p>
+
+    <ul>
+      <li>fixed processing time per buffer</li>
+      <li>no buffer overruns</li>
+      <li>no dynamic allocation</li>
+      <li>no blocking operations</li>
+      <li>deterministic execution</li>
+      <li>zero dropouts</li>
+    </ul>
+
+    <p>Audio callback must:</p>
+
+    <pre><code>process(input, output, N samples)
+    </code></pre>
+
+    <p>within:</p>
+
+    <pre><code>N / Fs seconds
+    </code></pre>
+
+    <p>Example:</p>
+
+    <ul>
+      <li>Fs = 48000</li>
+      <li>buffer = 64 samples</li>
+      <li>time available = 1.33 ms</li>
+    </ul>
+
+    <p>All DSP must finish before this deadline.</p>
+
+    <h2>12.2 Audio Thread vs Non-Real-Time Threads</h2>
+
+    <p>Audio applications typically have:</p>
+
+    <ul>
+      <li><strong>audio thread</strong> (real-time, highest priority)</li>
+      <li><strong>GUI thread</strong> (non-real-time)</li>
+      <li><strong>background threads</strong> (file loading, ML inference, etc.)</li>
+    </ul>
+
+    <p>Audio thread rules:</p>
+
+    <ul>
+      <li>no <code>lock()</code></li>
+      <li>no <code>malloc/free</code></li>
+      <li>no disk I/O</li>
+      <li>no <code>sleep()</code></li>
+      <li>no waiting</li>
+      <li>no logging</li>
+      <li>no virtual calls</li>
+    </ul>
+
+    <h2>12.3 Block Processing &amp; Buffering</h2>
+
+    <p>DSP is done in blocks:</p>
+
+    <ul>
+      <li>block size N</li>
+      <li>overlap-save or overlap-add for convolution</li>
+      <li>circular buffers for delay lines</li>
+    </ul>
+
+    <p>Circular buffer index:</p>
+
+    <pre><code>idx = (idx + 1) % buffer_size
+    </code></pre>
+
+    <p>Block diagram:</p>
+
+    <pre class="ascii-art">input → process block → output
+    </pre>
+
+    <h2>12.4 Latency &amp; Buffer Size</h2>
+
+    <p>Latency:</p>
+
+    <pre><code>latency = (buffer size) / sample rate + hardware delays
+    </code></pre>
+
+    <p>Trade-offs:</p>
+
+    <ul>
+      <li>small buffers → low latency, high CPU load</li>
+      <li>large buffers → high latency, stable processing</li>
+    </ul>
+
+    <p>Live performance requires:</p>
+
+    <pre><code>&lt; 5 ms round-trip latency
+    </code></pre>
+
+    <h2>12.5 CPU Optimization Techniques</h2>
+
+    <p>Key techniques:</p>
+
+    <h3>SIMD (vectorization)</h3>
+
+    <ul>
+      <li>SSE</li>
+      <li>AVX</li>
+      <li>NEON (ARM)</li>
+    </ul>
+
+    <p>Vectorization boosts performance by 2–8×.</p>
+
+    <h3>Loop unrolling</h3>
+
+    <p>Reduces overhead.</p>
+
+    <h3>Lookup tables</h3>
+
+    <p>Avoid expensive math:</p>
+
+    <ul>
+      <li>sin/cos tables</li>
+      <li>log/exp tables</li>
+    </ul>
+
+    <h3>Avoid divisions</h3>
+
+    <p>Multiply by reciprocal instead.</p>
+
+    <h3>Branchless code</h3>
+
+    <p>Use mathematical expressions instead of <code>if/else</code>.</p>
+
+    <h2>12.6 Memory Optimization</h2>
+
+    <p>Cache-aware design:</p>
+
+    <ul>
+      <li>contiguous arrays</li>
+      <li>align to 16 or 32 bytes</li>
+      <li>structure-of-arrays (SoA) vs array-of-structures (AoS)</li>
+    </ul>
+
+    <p>Avoid:</p>
+
+    <ul>
+      <li>pointer chasing</li>
+      <li>cache misses</li>
+      <li>indirection</li>
+    </ul>
+
+    <p>Audio buffers should be:</p>
+
+    <ul>
+      <li>small</li>
+      <li>aligned</li>
+      <li>static</li>
+    </ul>
+
+    <h2>12.7 Fixed-Point DSP (Embedded Devices)</h2>
+
+    <p>Used in:</p>
+
+    <ul>
+      <li>microcontrollers (ARM Cortex-M)</li>
+      <li>hardware pedals</li>
+      <li>hearing aids</li>
+      <li>digital synthesizers</li>
+    </ul>
+
+    <p>Fixed-point format:</p>
+
+    <pre><code>Q15: 1 sign bit + 15 fractional bits
+    </code></pre>
+
+    <p>Advantages:</p>
+
+    <ul>
+      <li>fast</li>
+      <li>predictable</li>
+      <li>low-power</li>
+    </ul>
+
+    <p>Challenges:</p>
+
+    <ul>
+      <li>overflow</li>
+      <li>scaling</li>
+      <li>precision loss</li>
+    </ul>
+
+    <p>DSP must manage:</p>
+
+    <ul>
+      <li>saturation arithmetic</li>
+      <li>quantization noise</li>
+    </ul>
+
+    <h2>12.8 Floating Point DSP (PC, Mobile, Modern Hardware)</h2>
+
+    <p>Float formats:</p>
+
+    <ul>
+      <li><code>float32</code> (single precision)</li>
+      <li><code>float64</code> (double)</li>
+    </ul>
+
+    <p>Float advantages:</p>
+
+    <ul>
+      <li>large dynamic range</li>
+      <li>minimal scaling</li>
+      <li>fewer overflows</li>
+      <li>easier algorithm design</li>
+    </ul>
+
+    <p>Denormals (tiny float values) must be handled:</p>
+
+    <ul>
+      <li>flush-to-zero</li>
+      <li>add small noise</li>
+    </ul>
+
+    <p>Denormals can slow DSP by ×100 if not handled.</p>
+
+    <h2>12.9 Plugin Architectures: VST, AU, AAX</h2>
+
+    <p><strong>VST3</strong> (Steinberg):</p>
+
+    <ul>
+      <li>cross-platform</li>
+      <li>standard for music software</li>
+    </ul>
+
+    <p><strong>AU</strong> (Apple AudioUnit):</p>
+
+    <ul>
+      <li>macOS &amp; iOS</li>
+      <li>Logic uses AUv2/AUv3</li>
+    </ul>
+
+    <p><strong>AAX</strong>:</p>
+
+    <ul>
+      <li>Pro Tools format</li>
+    </ul>
+
+    <p>Plugin structure:</p>
+
+    <pre><code>initialize()
+    processBlock(input, output, N)
+    setParameter(param, value)
+    suspend/resume
+    </code></pre>
+
+    <p>Real-time rules apply to <code>processBlock</code>.</p>
+
+    <h2>12.10 Audio Engine Architecture</h2>
+
+    <p>Typical structure:</p>
+
+    <pre class="ascii-art">AudioDevice → Callback → DSP Graph → Output
+    </pre>
+
+    <p>DSP graph:</p>
+
+    <ul>
+      <li>nodes</li>
+      <li>connections</li>
+      <li>bypass</li>
+      <li>dry/wet</li>
+      <li>automation</li>
+    </ul>
+
+    <p>Must support:</p>
+
+    <ul>
+      <li>sample-rate changes</li>
+      <li>buffer-size changes</li>
+      <li>state saving</li>
+      <li>preset loading</li>
+    </ul>
+
+    <h2>12.11 Real-Time Safe Parameter Smoothing</h2>
+
+    <p>When the user moves a slider:</p>
+
+    <ul>
+      <li>value cannot jump instantly</li>
+      <li>needs smoothing</li>
+    </ul>
+
+    <p>Linear smoothing:</p>
+
+    <pre><code>y[n] = y[n−1] + α (target − y[n−1])
+    </code></pre>
+
+    <p>Exponential smoothing:</p>
+
+    <pre><code>y[n] = (1 − g) y[n−1] + g target
+    </code></pre>
+
+    <p>Used for:</p>
+
+    <ul>
+      <li>filter cutoff</li>
+      <li>gain</li>
+      <li>envelope attack/release</li>
+      <li>modulation depths</li>
+    </ul>
+
+    <h2>12.12 Audio Graph Scheduling</h2>
+
+    <p>Audio engines often use directed acyclic graphs (DAGs).</p>
+
+    <p>Nodes:</p>
+
+    <ul>
+      <li>filters</li>
+      <li>oscillators</li>
+      <li>mixers</li>
+      <li>analyzers</li>
+    </ul>
+
+    <p>Graph execution must be:</p>
+
+    <ul>
+      <li>topologically sorted</li>
+      <li>sample-accurate</li>
+      <li>real-time safe</li>
+    </ul>
+
+    <h2>12.13 Convolution Optimization (Real-Time IR Reverb)</h2>
+
+    <p>Long convolution uses <strong>partitioned convolution</strong>:</p>
+
+    <ul>
+      <li>split IR into small + large blocks</li>
+      <li>small blocks → low latency</li>
+      <li>big blocks → higher efficiency</li>
+    </ul>
+
+    <p>FFT convolution cost:</p>
+
+    <pre><code>O(N log N)
+    </code></pre>
+
+    <p>Used in:</p>
+
+    <ul>
+      <li>convolution reverb</li>
+      <li>cabinet IRs</li>
+      <li>impulse response effects</li>
+    </ul>
+
+    <h2>12.14 Interpolation &amp; Resampling in Real-Time</h2>
+
+    <p>Interpolation types:</p>
+
+    <ul>
+      <li>nearest</li>
+      <li>linear</li>
+      <li>cubic</li>
+      <li>sinc-based</li>
+    </ul>
+
+    <p>For pitch shifting or sample playback:</p>
+
+    <pre><code>position += rate
+    output = interpolate(sample, position)
+    </code></pre>
+
+    <p>High-quality resampling:</p>
+
+    <ul>
+      <li>polyphase filters</li>
+      <li>windowed sinc</li>
+      <li>min-phase sinc</li>
+    </ul>
+
+    <h2>12.15 Modular Synth Architecture</h2>
+
+    <p>Modules:</p>
+
+    <ul>
+      <li>VCO</li>
+      <li>VCF</li>
+      <li>VCA</li>
+      <li>envelopes</li>
+      <li>LFOs</li>
+      <li>sequencers</li>
+      <li>mixers</li>
+    </ul>
+
+    <p>Signal flow:</p>
+
+    <pre class="ascii-art">Oscillator → Filter → VCA → Output
+    Modulation: Env/LFO → any parameter
+    </pre>
+
+    <p>Must support:</p>
+
+    <ul>
+      <li>audio-rate modulation</li>
+      <li>parameter smoothing</li>
+      <li>polyphony</li>
+    </ul>
+
+    <h2>12.16 Audio Routing, Buses, and Summing</h2>
+
+    <p>Mixers use buses:</p>
+
+    <ul>
+      <li>master bus</li>
+      <li>aux sends</li>
+      <li>submixes</li>
+      <li>parallel processing</li>
+    </ul>
+
+    <p>Summing:</p>
+
+    <pre><code>out = Σ inputs
+    </code></pre>
+
+    <p>Digital summing must handle:</p>
+
+    <ul>
+      <li>clipping prevention</li>
+      <li>headroom</li>
+      <li>floating-point accumulation</li>
+    </ul>
+
+    <p>Double precision summing is recommended.</p>
+
+    <h2>12.17 Multithreading &amp; Audio</h2>
+
+    <p>Audio engines use multithreading carefully:</p>
+
+    <ul>
+      <li>parallel processing for tracks</li>
+      <li>worker threads for non-RT work</li>
+      <li>lock-free FIFOs for communication</li>
+    </ul>
+
+    <p>Lock-free queues:</p>
+
+    <pre><code>single-producer, single-consumer (SPSC)
+    </code></pre>
+
+    <p>Avoid:</p>
+
+    <ul>
+      <li>mutexes</li>
+      <li>condition variables</li>
+      <li>context switching in audio thread</li>
+    </ul>
+
+    <h2>12.18 Audio File I/O &amp; Streaming</h2>
+
+    <p>Containers:</p>
+
+    <ul>
+      <li>WAV</li>
+      <li>AIFF</li>
+      <li>FLAC</li>
+      <li>AAC</li>
+      <li>MP3</li>
+      <li>OGG</li>
+    </ul>
+
+    <p>Streaming:</p>
+
+    <ul>
+      <li>read file in chunks</li>
+      <li>decode in background thread</li>
+      <li>feed audio thread buffers</li>
+    </ul>
+
+    <p>Ring buffer pipeline:</p>
+
+    <pre class="ascii-art">disk → decoding → ring buffer → audio thread
+    </pre>
+
+    <h2>12.19 Testing &amp; Debugging DSP</h2>
+
+    <p>Tools:</p>
+
+    <ul>
+      <li>impulse tests</li>
+      <li>step response</li>
+      <li>frequency sweep</li>
+      <li>THD measurement</li>
+      <li>latency measurement</li>
+      <li>CPU stress tests</li>
+    </ul>
+
+    <p>Check:</p>
+
+    <ul>
+      <li>denormal issues</li>
+      <li>CPU spikes</li>
+      <li>memory alignment</li>
+      <li>clipping</li>
+      <li>buffer boundaries (off-by-one errors)</li>
+    </ul>
+
+    <h2>12.20 Deployment &amp; Optimization in Products</h2>
+
+    <p>Design goals:</p>
+
+    <ul>
+      <li>low CPU</li>
+      <li>low memory</li>
+      <li>stable latency</li>
+      <li>robust parameter handling</li>
+      <li>cross-platform consistency</li>
+    </ul>
+
+    <p>Techniques:</p>
+
+    <ul>
+      <li>plugin sandboxing</li>
+      <li>SIMD optimization</li>
+      <li>compile-time constants</li>
+      <li>profile-guided optimization</li>
+      <li>audio engine abstraction layers</li>
+    </ul>
+
+    <div class="section-break"></div>
+
+    <h1>INDEX</h1>
+
+    <h2>A</h2>
+    <p><strong>Additive synthesis</strong> – 5.2<br/>
+    <strong>Adaptive filters</strong> – 11.16<br/>
+    <strong>ADSR envelopes</strong> – 5.11<br/>
+    <strong>Aliasing</strong> – 2.1.3, 5.10, 9.5<br/>
+    <strong>All-pass filters</strong> – 4.11, 7.8<br/>
+    <strong>Ambisonics</strong> – 11.10, 11.11<br/>
+    <strong>Amplitude modulation (AM)</strong> – 5.16<br/>
+    <strong>Analytic signal</strong> – 11.9<br/>
+    <strong>Anti-aliasing filters</strong> – 2.3<br/>
+    <strong>Attack/Release smoothing</strong> – 9.1<br/>
+    <strong>Audio callbacks</strong> – 12.1, 12.2<br/>
+    <strong>Audio classification</strong> – 10.9<br/>
+    <strong>Audio embeddings</strong> – 10.14<br/>
+    <strong>Audio engine architecture</strong> – 12.10<br/>
+    <strong>Audio file I/O</strong> – 12.18<br/>
+    <strong>Autocorrelation</strong> – 3.24, 6.8<br/>
+    <strong>Auto-tune / pitch correction</strong> – 9.12</p>
+
+    <h2>B</h2>
+    <p><strong>Backpropagation in DSP (indirect via DDSP)</strong> – 10.7<br/>
+    <strong>Bark scale</strong> – 8.2<br/>
+    <strong>Bessel functions (modal synthesis)</strong> – 4.20<br/>
+    <strong>Binaural audio</strong> – 8.8, 11.11<br/>
+    <strong>Bit depth</strong> – 2.2<br/>
+    <strong>BLEP (PolyBLEP / MinBLEP)</strong> – 5.10<br/>
+    <strong>Block processing</strong> – 12.3<br/>
+    <strong>Blind source separation</strong> – 11.3<br/>
+    <strong>Bode plots (implicit via filters)</strong> – 4.x<br/>
+    <strong>Bowed-string modeling</strong> – 4.21, 11.14<br/>
+    <strong>Buffer size &amp; latency</strong> – 12.4</p>
+
+    <h2>C</h2>
+    <p><strong>Cepstrum</strong> – 3.14, 10.5<br/>
+    <strong>Chroma features</strong> – 3.33, 10.1, 6.x<br/>
+    <strong>Chorus</strong> – 5.7, 9.6<br/>
+    <strong>Circular buffers</strong> – 12.3<br/>
+    <strong>Clipping (digital)</strong> – 2.9<br/>
+    <strong>Coding (MP3/AAC psychoacoustics)</strong> – 3.30, 8.x<br/>
+    <strong>Comb filters</strong> – 4.14<br/>
+    <strong>Compressed sensing</strong> – 11.4<br/>
+    <strong>Compression (dynamic)</strong> – 7.3, 9.1<br/>
+    <strong>Consonance/dissonance</strong> – 6.5, 8.6<br/>
+    <strong>Constant-Q transform (CQT)</strong> – 3.32<br/>
+    <strong>Convolution</strong> – 3.35, 9.9, 12.13<br/>
+    <strong>Cross-synthesis</strong> – 5.13<br/>
+    <strong>Crossover filters</strong> – 4.x<br/>
+    <strong>Critical bands</strong> – 8.2</p>
+
+    <h2>D</h2>
+    <p><strong>DAC reconstruction filter</strong> – 2.3<br/>
+    <strong>DAHDSR envelopes</strong> – 5.11<br/>
+    <strong>DCT (MFCC)</strong> – 10.1, 3.x<br/>
+    <strong>DDSP (Differentiable DSP)</strong> – 10.7<br/>
+    <strong>Deconvolution</strong> – 11.2, 11.12<br/>
+    <strong>Delay (simple, multitap, modulated)</strong> – 7.6, 9.7<br/>
+    <strong>Denormals</strong> – 12.8<br/>
+    <strong>Dereverberation</strong> – 11.12<br/>
+    <strong>Detuning (via FFT or synthesis)</strong> – 3.x, 5.x<br/>
+    <strong>Differentiable audio pipelines</strong> – 10.7<br/>
+    <strong>Digital oscillators</strong> – 5.10<br/>
+    <strong>Digital filter design</strong> – 4.9<br/>
+    <strong>Distortion/waveshaping</strong> – 5.12, 7.5, 9.5<br/>
+    <strong>Dither</strong> – 2.2.3<br/>
+    <strong>Downsampling / upsampling</strong> – 2.7, 12.14</p>
+
+    <h2>E</h2>
+    <p><strong>Early reflections</strong> – 7.7<br/>
+    <strong>Echo cancellation</strong> – 10.13, 11.16<br/>
+    <strong>Effects (DSP design)</strong> – 9.x<br/>
+    <strong>EQ (parametric/shelf/notch)</strong> – 7.2<br/>
+    <strong>Envelope follower</strong> – 9.1<br/>
+    <strong>Equal-loudness curves</strong> – 8.3<br/>
+    <strong>Equal temperament</strong> – 6.3<br/>
+    <strong>ESPRIT/MUSIC</strong> – 11.5</p>
+
+    <h2>F</h2>
+    <p><strong>FDN (feedback delay network)</strong> – 4.23, 7.7, 11.10<br/>
+    <strong>FDTD (finite difference, wave equation)</strong> – 11.13<br/>
+    <strong>FFT (theory and usage)</strong> – 3.x<br/>
+    <strong>Filterbanks</strong> – 3.21, 11.6<br/>
+    <strong>Filtering (IIR/FIR)</strong> – 4.x<br/>
+    <strong>Flanger</strong> – 7.8, 9.6<br/>
+    <strong>Floating-point DSP</strong> – 12.8<br/>
+    <strong>FM synthesis</strong> – 5.4, 5.5<br/>
+    <strong>Formants</strong> – 6.8, 8.10<br/>
+    <strong>Fourier transform fundamentals</strong> – 3.1–3.3<br/>
+    <strong>Frame-based processing</strong> – 3.10<br/>
+    <strong>Frequency masking</strong> – 8.4</p>
+
+    <h2>G</h2>
+    <p><strong>Gabor transform</strong> – 3.36<br/>
+    <strong>Gain staging</strong> – 7.1<br/>
+    <strong>GAN audio synthesis</strong> – 10.7<br/>
+    <strong>Granular synthesis</strong> – 5.7<br/>
+    <strong>Group delay</strong> – 3.25<br/>
+    <strong>GUI thread vs audio thread</strong> – 12.2</p>
+
+    <h2>H</h2>
+    <p><strong>Harmonics</strong> – 6.2<br/>
+    <strong>Harmonic-percussive separation (HPS)</strong> – 9.14<br/>
+    <strong>Hearing damage</strong> – 8.12<br/>
+    <strong>HRTF</strong> – 8.8, 11.11<br/>
+    <strong>Hilbert transform</strong> – 11.9</p>
+
+    <h2>I</h2>
+    <p><strong>IIR filters</strong> – 4.4<br/>
+    <strong>Impulse response</strong> – 4.8, 9.9<br/>
+    <strong>Instantaneous frequency</strong> – 3.37, 11.9<br/>
+    <strong>Interpolation (audio-rate)</strong> – 12.14</p>
+
+    <h2>J</h2>
+    <p><strong>Just intonation</strong> – 6.3</p>
+
+    <h2>K</h2>
+    <p><strong>Karplus–Strong</strong> – 4.22<br/>
+    <strong>Key detection</strong> – 6.9<br/>
+    <strong>Knee (soft/hard compressor)</strong> – 9.2</p>
+
+    <h2>L</h2>
+    <p><strong>Ladder filters (Moog)</strong> – 4.26<br/>
+    <strong>Latency</strong> – 12.4<br/>
+    <strong>LFO modulation</strong> – 5.11<br/>
+    <strong>Limiter</strong> – 7.4, 9.3<br/>
+    <strong>Linear-phase FIR</strong> – 4.3, 7.2<br/>
+    <strong>Linear predictive coding (LPC)</strong> – 3.23, 10.x</p>
+
+    <h2>M</h2>
+    <p><strong>Machine learning (audio)</strong> – 10.x<br/>
+    <strong>Masking (spectral/temporal)</strong> – 3.30, 8.4<br/>
+    <strong>Mastering</strong> – 7.13<br/>
+    <strong>Matching pursuit</strong> – 11.17<br/>
+    <strong>Mel scale</strong> – 3.12, 10.1<br/>
+    <strong>Memory optimization</strong> – 12.6<br/>
+    <strong>Microtuning</strong> – 6.7<br/>
+    <strong>MIDI mapping</strong> – 6.13<br/>
+    <strong>Modal synthesis</strong> – 4.20<br/>
+    <strong>Modulated delay</strong> – 9.6<br/>
+    <strong>Moog ladder</strong> – 4.26</p>
+
+    <h2>N</h2>
+    <p><strong>Nearest-neighbor / cubic interpolation</strong> – 12.14<br/>
+    <strong>Neural audio transformation</strong> – 10.7–10.10<br/>
+    <strong>Neural TTS</strong> – 10.8<br/>
+    <strong>Noise reduction</strong> – 3.29, 9.4, 10.13<br/>
+    <strong>Nonlinear physical modeling</strong> – 11.14<br/>
+    <strong>Normalization (LUFS)</strong> – 7.4, 7.13<br/>
+    <strong>NMF (non-negative matrix factorization)</strong> – 11.3</p>
+
+    <h2>O</h2>
+    <p><strong>Octaves &amp; frequency ratios</strong> – 6.1<br/>
+    <strong>OLA / WOLA (overlap-add)</strong> – 3.11<br/>
+    <strong>Optimization (CPU, memory)</strong> – 12.5, 12.6</p>
+
+    <h2>P</h2>
+    <p><strong>Perception (psychoacoustics)</strong> – 8.x<br/>
+    <strong>Phase (FFT)</strong> – 3.8<br/>
+    <strong>Phase vocoder</strong> – 3.18, 9.10<br/>
+    <strong>Pitch detection</strong> – 6.8, 10.5<br/>
+    <strong>Pitch shifting</strong> – 9.11<br/>
+    <strong>Plugin architectures (VST/AU/AAX)</strong> – 12.9<br/>
+    <strong>PolyBLEP</strong> – 5.10<br/>
+    <strong>Polyphonic transcription</strong> – 10.6<br/>
+    <strong>Psychoacoustic models</strong> – 8.x, 3.30</p>
+
+    <h2>Q</h2>
+    <p><strong>Quantization</strong> – 2.2<br/>
+    <strong>Q-factor (filters, resonance)</strong> – 4.x<br/>
+    <strong>Quadrature signals</strong> – 11.9<br/>
+    <strong>QMF (quadrature mirror filters)</strong> – 11.6</p>
+
+    <h2>R</h2>
+    <p><strong>Reassigned spectrogram</strong> – 3.37<br/>
+    <strong>Resampling</strong> – 12.14<br/>
+    <strong>Reverberation algorithms</strong> – 7.7, 9.8<br/>
+    <strong>RNNs (GRU, LSTM)</strong> – 10.2<br/>
+    <strong>Room acoustics modeling</strong> – 11.10<br/>
+    <strong>Routing (audio graph)</strong> – 12.16</p>
+
+    <h2>S</h2>
+    <p><strong>Sample rate conversion</strong> – 2.22, 12.14<br/>
+    <strong>Sampling theorem</strong> – 2.1<br/>
+    <strong>Saturators</strong> – 7.5, 9.5<br/>
+    <strong>Scales (musical)</strong> – 6.3<br/>
+    <strong>Scattering transform</strong> – 11.7<br/>
+    <strong>Sine oscillators</strong> – 5.10<br/>
+    <strong>Soft clipping</strong> – 7.5, 9.5<br/>
+    <strong>Source separation</strong> – 10.4<br/>
+    <strong>Spectral analysis</strong> – 3.x<br/>
+    <strong>Spectral centroid/bandwidth/flux</strong> – 3.38<br/>
+    <strong>Spectral morphing</strong> – 5.13, 9.14<br/>
+    <strong>Spectrogram</strong> – 3.10<br/>
+    <strong>Speech perception</strong> – 8.10<br/>
+    <strong>State-variable filters</strong> – 4.26<br/>
+    <strong>STFT</strong> – 3.10<br/>
+    <strong>Subtractive synthesis</strong> – 5.3<br/>
+    <strong>Supervised / unsupervised audio ML</strong> – 10.x<br/>
+    <strong>Synchrosqueezing</strong> – 11.8<br/>
+    <strong>Synth architecture</strong> – 12.15</p>
+
+    <h2>T</h2>
+    <p><strong>Tanh saturation</strong> – 7.5, 9.5<br/>
+    <strong>Tempo &amp; beat estimation</strong> – 6.6<br/>
+    <strong>Time-frequency analysis</strong> – 3.x<br/>
+    <strong>Time stretch</strong> – 9.10<br/>
+    <strong>Transients</strong> – 7.12<br/>
+    <strong>Transformers (audio)</strong> – 10.2<br/>
+    <strong>True peak limiting</strong> – 7.4<br/>
+    <strong>Tuning systems</strong> – 6.3, 6.7</p>
+
+    <h2>U</h2>
+    <p><strong>Upsampling</strong> – 2.22<br/>
+    <strong>Unwrap (phase)</strong> – 3.34</p>
+
+    <h2>V</h2>
+    <p><strong>Vibrato &amp; tremolo</strong> – 7.8<br/>
+    <strong>Virtual analog modeling</strong> – 4.26, 5.10<br/>
+    <strong>Vocoder</strong> – 5.13, 9.13<br/>
+    <strong>Voice conversion</strong> – 10.8<br/>
+    <strong>VST plug-ins</strong> – 12.9</p>
+
+    <h2>W</h2>
+    <p><strong>Waveshaping</strong> – 5.12, 9.5<br/>
+    <strong>Waveguides</strong> – 4.21<br/>
+    <strong>Wavelets</strong> – 3.22, 11.7<br/>
+    <strong>Wavetable synthesis</strong> – 5.6<br/>
+    <strong>Wiener filtering</strong> – 3.41<br/>
+    <strong>WSOLA</strong> – 9.10</p>
+
+    <h2>Z</h2>
+    <p><strong>Zero-crossing rate</strong> – 10.1<br/>
+    <strong>Zero-padding</strong> – 3.16<br/>
+    <strong>Z-transform</strong> – 4.20</p>
+  </div>
+
+  </body>
+</html>
+
