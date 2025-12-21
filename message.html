@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Faith (Itzlazzzy) — My Life Story</title>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: "Georgia", "Times New Roman", serif;
+            background: #f1f1f1;
+            color: #222;
+            line-height: 1.7;
+        }
+
+        header {
+            background: #1f1f1f;
+            color: white;
+            padding: 80px 20px;
+            text-align: center;
+            border-bottom: 5px solid #444;
+        }
+
+        header h1 {
+            font-size: 3rem;
+            margin: 0;
+            letter-spacing: 1px;
+        }
+
+        header p {
+            font-size: 1.2rem;
+            opacity: 0.8;
+            margin-top: 10px;
+        }
+
+        nav {
+            background: #e7e7e7;
+            padding: 12px;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            border-bottom: 1px solid #ccc;
+        }
+
+        nav a {
+            margin: 0 20px;
+            text-decoration: none;
+            color: #222;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 50px auto;
+            padding: 0 20px;
+            background: white;
+            border: 1px solid #ddd;
+            padding-bottom: 50px;
+        }
+
+        section {
+            margin: 60px 0;
+        }
+
+        section h2 {
+            font-size: 2.2rem;
+            margin-bottom: 15px;
+            color: #111;
+            font-weight: 700;
+        }
+
+        section p {
+            font-size: 1.15rem;
+            color: #333;
+        }
+
+        footer {
+            background: #1f1f1f;
+            color: #bbb;
+            text-align: center;
+            padding: 30px 10px;
+            margin-top: 60px;
+            font-size: 0.95rem;
+            border-top: 5px solid #444;
+        }
+        
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>Faith (Itzlazzzy)</h1>
+        <p>My Journey To Today's Me</p>
+        <button id="darkModeToggle">Toggle Dark Mode</button>
+    </header>
+
+    <nav>
+        <a href="#intro">Introduction</a>
+        <a href="#early">Early Life</a>
+        <a href="#career">Career</a>
+        <a href="#lessons">Life Lessons</a>
+        <a href="#contact">Contact</a>
+    </nav>
+
+    <div class="container">
+
+        <section id="intro">
+            <h2>Introduction</h2>
+            <p>
+                My name is Faith, also known online as Itzlazzzy. My life has been a mix of challenges, doubts, and self-discovery. On this page is where I express my past <span id="years"></span> years from the moment I was born.
+            </p>
+        </section>
+
+        <section id="early">
+            <h2>Early Life</h2>
+            <p>
+                <h3>Hong Kong</h3>
+                I grew up in Hong Kong, a densely populated city located at the south of China. The food in Hong Kong is delicious and I promised myself if I ever go back to Hong Kong, the first thing I will do is to buy a lot of food and eat. 
+                <h3>kindergarten</h3>
+                In my memory, the earliest thing I could remember is at kindergarten.
+                My memory about this part was quite blurry, so I mainly just remember that I got really angry, and I tried flip over a table inside the classroom. 
+                As expected, the teachers tried to stop me.
+                <br><br>
+                One interesting memory is that I was walking in the corridoor, and for some reason I bump into the wall and hit my nose. As I feel the pain, I saw blood comes out my nose. 
+                I wasn't freaked out or anything, but it was my first time having a nose bleed (And last, I have never had another nose bleed after that.), so I kinda got excited about it and rush into the bathroom to get tissue only to get told off not to run.
+                <br><br>
+                Do I trust myself's memory? To be honest, No. But I do think that it went the way it is.
+                <h3>Primary School - Year 1/2</h3>
+                Skipping to Primary school
+
+            </p>
+        </section>
+
+        <section id="career">
+            <h2>Career & Journey</h2>
+            <p>
+                <!-- Placeholder -->
+                This section will explore the paths I've taken, my work, evolving interests, and achievements.
+            </p>
+        </section>
+
+        <section id="lessons">
+            <h2>Life Lessons & Reflections</h2>
+            <p>
+                <!-- Placeholder -->
+                This section will include the insights, values, and principles that guide me.
+            </p>
+        </section>
+
+        <section id="contact">
+            <h2>Contact</h2>
+            <p>
+                <!-- Placeholder -->
+                Contact information or social links can be added here.
+            </p>
+        </section>
+
+    </div>
+
+    <footer>
+        © <span id="year"></span> Time Well — All Rights Reserved
+    </footer>
+
+    <script>
+        document.getElementById("year").textContent = new Date().getFullYear();
+            
+        const startDate = new Date("2010-11-02"); // YYYY-MM-DD00
+
+        const now = new Date();
+
+        // Calculate full years (round down)
+        let years = now.getFullYear() - startDate.getFullYear();
+        const hasHadAnniversaryThisYear = (now.getMonth() > startDate.getMonth()) || 
+            (now.getMonth() === startDate.getMonth() && now.getDate() >= startDate.getDate());
+
+        if (!hasHadAnniversaryThisYear) {
+            years--; // subtract 1 if the anniversary hasn't happened yet this year
+        }
+
+        // Insert the value into your HTML
+        document.getElementById("years").textContent = years;
+    
+    </script>
+</body>
+</html>

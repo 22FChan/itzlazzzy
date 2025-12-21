@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Faith (Itzlazzzy) — My Life Story</title>
+
+    <!-- Signature-style font -->
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+
+    <!-- Social icon library -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+    <style>
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* HIDE SCROLLBAR (scroll still works) */
+        ::-webkit-scrollbar {
+            width: 0px;
+        }
+
+        /* NORMAL BACKGROUND (RESTORED) */
+        body {
+            margin: 0;
+            font-family: Georgia, serif;
+            background: #f0f0f0;
+            color: #222;
+            transition: background 0.3s, color 0.3s;
+            line-height: 1.7;
+            cursor: none;  /* hide the default cursor */
+        }
+
+
+        /* DARK MODE BACKGROUND */
+        body.dark-mode {
+            background: #1e1e1e;
+            color: #f5f5f5;
+        }
+
+        #cursor {
+            position: fixed;
+            width: 32px;          /* your cursor size */
+            height: 32px;
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+            background-image: url('cursor.png'); /* your image path */
+            background-size: contain;   /* make image fit nicely */
+            background-repeat: no-repeat;
+            background-position: center;
+            z-index: 99999;
+        }
+
+
+        body.dark-mode #cursor {
+            background: rgba(255, 223, 0, 0.5);
+            box-shadow: 0 0 20px rgba(255, 223, 0, 0.9);
+        }
+
+        /* 🌈 GLOWING VERTICAL PROGRESS BAR */
+        #scroll-progress {
+            position: fixed;
+            right: 0;
+            top: 0;
+            width: 8px;
+            height: 0;
+            background: linear-gradient(180deg, #00c6ff, #0072ff);
+            filter: drop-shadow(0 0 6px #00c6ff);
+            z-index: 9999;
+            border-radius: 5px;
+            transition: height 0.15s linear;
+        }
+
+        body.dark-mode #scroll-progress {
+            background: linear-gradient(180deg, #ffcc00, #ff8800);
+            filter: drop-shadow(0 0 6px #ffcc00);
+        }
+
+        /* HEADER */
+        header {
+            background: #1f1f1f;
+            color: white;
+            padding: 60px 20px;
+            text-align: center;
+            border-bottom: 5px solid #444;
+        }
+
+        header h1 {
+            font-family: 'Pacifico', cursive;
+            font-size: 3.2rem;
+            margin: 0;
+        }
+
+        nav {
+            background: #e6e6e6;
+            text-align: center;
+            padding: 12px;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            border-bottom: 1px solid #ccc;
+        }
+
+        nav a {
+            margin: 0 20px;
+            text-decoration: none;
+            color: inherit;
+            font-weight: bold;
+        }
+
+        #darkModeToggle,
+        #musicToggle {
+            padding: 6px 12px;
+            margin-left: 20px;
+            cursor: pointer;
+        }
+
+        /* MAIN CONTAINER */
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 20px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+        }
+
+        body.dark-mode .container {
+            background: #222;
+            border-color: #333;
+        }
+
+        /* PROFILE PHOTO */
+        #profile-photo img {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid #444;
+        }
+
+        /* FOOTER */
+        footer {
+            background: #1f1f1f;
+            color: #bbb;
+            text-align: center;
+            padding: 30px;
+            margin-top: 60px;
+            border-top: 5px solid #444;
+        }
+
+        /* SOCIAL ICONS */
+        #social a {
+            margin: 0 10px;
+            font-size: 1.5rem;
+            color: inherit;
+            text-decoration: none;
+        }
+        #social a:hover {
+            color: #0077ff;
+        }
+
+    </style>
+</head>
+
+<body>
+
+    <!-- Custom Cursor -->
+    <div id="cursor"></div>
+
+    <!-- Vertical Scroll Progress Bar -->
+    <div id="scroll-progress"></div>
+
+    <header>
+        <h1>Faith (Itzlazzzy)</h1>
+        <p>My Life Story — A Journey Still Continuing</p>
+    </header>
+
+    <nav>
+        <a href="#profile-photo">Profile</a>
+        <a href="#intro">Introduction</a>
+        <a href="#contact">Contact</a>
+        <button id="darkModeToggle">Dark Mode</button>
+        <button id="musicToggle">Music</button>
+        <audio id="bgMusic" loop>
+            <source src="assets/sounds/chopin_etude-op25-no5.mp3" type="audio/mp3">
+        </audio>
+
+    </nav>
+
+    <div class="container">
+
+        <!-- PROFILE PHOTO -->
+        <section id="profile-photo" style="text-align:center;">
+            <img src="your-photo.jpg" alt="Your photo" />
+            <h2>Faith / Itzlazzzy</h2>
+        </section>
+
+        <section id="intro">
+            <h2>Introduction</h2>
+            <p>
+                My name is Faith, also known online as Itzlazzzy. My life has been a mix of challenges, doubts, and self-discovery. On this page is where I express my past <span id="years"></span> years from the moment I was born.
+            </p>
+        </section>
+
+        <section id="early">
+            <h2>Early Life</h2>
+            <p>
+                <h3>Hong Kong</h3>
+                I grew up in Hong Kong, a densely populated city located at the south of China...
+            </p>
+        </section>
+
+        <section id="career">
+            <h2>Career & Journey</h2>
+            <p>This section will explore the paths I've taken...</p>
+        </section>
+
+        <section id="lessons">
+            <h2>Life Lessons & Reflections</h2>
+            <p>This section will include the insights and values that guide me.</p>
+        </section>
+
+        <section id="contact">
+            <h2>Contact</h2>
+            <p>Feel free to reach out through my social platforms below.</p>
+            <div id="social">
+                <a href="#"><i class="fab fa-twitter"></i></a>
+                <a href="#"><i class="fab fa-instagram"></i></a>
+                <a href="#"><i class="fab fa-github"></i></a>
+            </div>
+        </section>
+
+    </div>
+
+    <footer>
+        © <span id="year"></span> Faith / Itzlazzzy — All Rights Reserved
+    </footer>
+
+    <script>
+        /* DARK MODE */
+        document.getElementById("darkModeToggle").addEventListener("click", () => {
+            document.body.classList.toggle("dark-mode");
+        });
+
+        /* AUTO YEAR */
+        document.getElementById("year").textContent = new Date().getFullYear();
+
+        /* DYNAMIC YEARS */
+        const startDate = new Date("2018-06-15");
+        const now = new Date();
+        let years = now.getFullYear() - startDate.getFullYear();
+        const hasHadAnniversary =
+            now.getMonth() > startDate.getMonth() ||
+            (now.getMonth() === startDate.getMonth() && now.getDate() >= startDate.getDate());
+        if (!hasHadAnniversary) years--;
+        document.getElementById("years").textContent = years;
+
+        /* 🌈 SCROLL PROGRESS BAR */
+        window.addEventListener("scroll", () => {
+            const scrollTop = document.documentElement.scrollTop;
+            const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
+            const progress = (scrollTop / scrollHeight) * 100;
+            document.getElementById("scroll-progress").style.height = progress + "%";
+        });
+
+        /* ✨ SMOOTH TRAILING CURSOR */
+        const cursor = document.getElementById("cursor");
+        let mouseX = 0, mouseY = 0;
+        let cursorX = 0, cursorY = 0;
+
+        document.addEventListener("mousemove", (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+        });
+
+        // cursor follows with delay
+        function animateCursor() {
+            cursorX += (mouseX - cursorX) * 0.15;
+            cursorY += (mouseY - cursorY) * 0.15;
+
+            cursor.style.left = cursorX + "px";
+            cursor.style.top = cursorY + "px";
+
+            requestAnimationFrame(animateCursor);
+        }
+
+        animateCursor();
+
+        /* 🎵 MUSIC TOGGLE */
+        const music = document.getElementById("bgMusic");
+        let musicPlaying = false;
+
+        document.getElementById("musicToggle").addEventListener("click", () => {
+            music.volume = 1.0; // make sure it's audible
+
+            if (musicPlaying) {
+                music.pause();
+            } else {
+                music.play().catch(err => {
+                    console.log("Cannot play audio:", err);
+                });
+            }
+            
+            musicPlaying = !musicPlaying;
+        });
+
+
+    </script>
+
+</body>
+</html>
